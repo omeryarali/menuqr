@@ -1,3 +1,4 @@
+import { MenuImage } from "@/components/menu/menu-image";
 import { formatPrice } from "@/lib/utils/format";
 import type { CategoryWithProducts } from "@/types/database";
 
@@ -26,37 +27,48 @@ export function MenuSection({ category, currency }: { category: CategoryWithProd
 
       <ul className="flex flex-col gap-4">
         {category.products.map((product) => (
-          <li key={product.id} style={{ opacity: product.is_available ? 1 : 0.5 }}>
-            <div className="flex items-baseline gap-2">
-              <h3 className="font-medium" style={{ fontFamily: "var(--menu-heading-font)" }}>
-                {product.name}
-              </h3>
-              {!product.is_available ? (
-                <span className="text-[0.7rem] whitespace-nowrap" style={{ color: "var(--menu-muted)" }}>
-                  Tükendi
+          <li
+            key={product.id}
+            className="flex gap-4"
+            style={{ opacity: product.is_available ? 1 : 0.5 }}
+          >
+            {product.image_url ? <MenuImage src={product.image_url} alt={product.name} /> : null}
+
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline gap-2">
+                <h3 className="font-medium" style={{ fontFamily: "var(--menu-heading-font)" }}>
+                  {product.name}
+                </h3>
+                {!product.is_available ? (
+                  <span className="text-[0.7rem] whitespace-nowrap" style={{ color: "var(--menu-muted)" }}>
+                    Tükendi
+                  </span>
+                ) : null}
+
+                {/* Dotted leader between name and price — a menu-typography staple. */}
+                <span
+                  aria-hidden
+                  className="relative -top-1 min-w-6 flex-1 border-b border-dotted"
+                  style={{ borderColor: "var(--menu-border)" }}
+                />
+
+                <span
+                  className="shrink-0 font-medium tabular-nums"
+                  style={{ color: "var(--menu-accent)", fontFamily: "var(--menu-heading-font)" }}
+                >
+                  {formatPrice(product.price, currency)}
                 </span>
+              </div>
+
+              {product.description ? (
+                <p
+                  className="mt-1 max-w-prose text-sm leading-relaxed text-pretty"
+                  style={{ color: "var(--menu-muted)" }}
+                >
+                  {product.description}
+                </p>
               ) : null}
-
-              {/* Dotted leader between name and price — a menu-typography staple. */}
-              <span
-                aria-hidden
-                className="relative -top-1 min-w-6 flex-1 border-b border-dotted"
-                style={{ borderColor: "var(--menu-border)" }}
-              />
-
-              <span
-                className="shrink-0 font-medium tabular-nums"
-                style={{ color: "var(--menu-accent)", fontFamily: "var(--menu-heading-font)" }}
-              >
-                {formatPrice(product.price, currency)}
-              </span>
             </div>
-
-            {product.description ? (
-              <p className="mt-1 max-w-prose text-sm leading-relaxed text-pretty" style={{ color: "var(--menu-muted)" }}>
-                {product.description}
-              </p>
-            ) : null}
           </li>
         ))}
       </ul>
