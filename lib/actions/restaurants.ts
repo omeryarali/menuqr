@@ -21,6 +21,7 @@ function parse(formData: FormData) {
     phone: formData.get("phone") ?? "",
     currency: formData.get("currency"),
     isPublished: formData.get("isPublished") === "on",
+    theme: formData.get("theme") ?? "classic",
   });
 }
 
@@ -49,6 +50,7 @@ export async function createRestaurant(_prev: ActionState, formData: FormData): 
       phone: nullify(input.phone),
       currency: input.currency,
       is_published: input.isPublished,
+      theme: input.theme,
     })
     .select("id")
     .single();
@@ -90,6 +92,7 @@ export async function updateRestaurant(
       phone: nullify(input.phone),
       currency: input.currency,
       is_published: input.isPublished,
+      theme: input.theme,
     })
     .eq("id", id)
     .select("id");

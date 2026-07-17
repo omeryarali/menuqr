@@ -46,6 +46,7 @@ export interface Database {
           phone: string | null;
           currency: string;
           is_published: boolean;
+          theme: string;
           created_at: string;
           updated_at: string;
         };
@@ -59,6 +60,7 @@ export interface Database {
           phone?: string | null;
           currency?: string;
           is_published?: boolean;
+          theme?: string;
         };
         Update: {
           name?: string;
@@ -68,6 +70,7 @@ export interface Database {
           phone?: string | null;
           currency?: string;
           is_published?: boolean;
+          theme?: string;
         };
         Relationships: [];
       };

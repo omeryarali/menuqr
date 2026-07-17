@@ -16,6 +16,9 @@ export const restaurantSchema = z.object({
   phone: z.string().trim().max(32, "Telefon çok uzun").optional().or(z.literal("")),
   currency: z.string().trim().length(3, "3 harfli para birimi kodu girin").toUpperCase(),
   isPublished: z.boolean(),
+  // Mirrors the CHECK in 0003_theme.sql. Unknown values fall back rather than
+  // erroring, so a stale form can't block a save.
+  theme: z.enum(["classic", "modern", "warm"]).catch("classic"),
 });
 
 export type RestaurantInput = z.infer<typeof restaurantSchema>;

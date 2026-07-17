@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { FieldError } from "@/components/shared/field-error";
 import { SubmitButton } from "@/components/shared/submit-button";
+import { ThemePicker } from "@/components/dashboard/theme-picker";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -109,6 +110,8 @@ export function RestaurantForm({ action, restaurant }: Props) {
         <Input id="phone" name="phone" type="tel" defaultValue={restaurant?.phone ?? ""} />
         <FieldError messages={fieldErrors?.phone} />
       </div>
+
+      <ThemePicker value={restaurant?.theme} />
 
       <div className="flex items-center justify-between rounded-lg border p-4">
         <div className="space-y-0.5 pr-4">

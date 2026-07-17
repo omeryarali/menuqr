@@ -128,3 +128,51 @@
     @apply font-sans;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Public-menu themes (/menu/{slug}).
+   Applied via data-menu-theme on the menu root; components read the --menu-*
+   variables. Ids match the CHECK in supabase/migrations/0003_theme.sql and the
+   registry in lib/themes.ts. --font-menu-serif is provided by app/menu/layout.
+   --------------------------------------------------------------------------- */
+[data-menu-theme] {
+  --menu-heading-weight: 600;
+  --menu-heading-tracking: -0.01em;
+  --menu-heading-transform: none;
+  --menu-body-font: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --menu-heading-font: var(--menu-body-font);
+}
+
+[data-menu-theme="classic"] {
+  --menu-bg: oklch(0.966 0.016 84);
+  --menu-bg-glow: oklch(0.93 0.03 80);
+  --menu-fg: oklch(0.29 0.024 62);
+  --menu-muted: oklch(0.5 0.025 65);
+  --menu-accent: oklch(0.52 0.086 62);
+  --menu-border: oklch(0.87 0.025 76);
+  --menu-heading-font: var(--font-menu-serif), Georgia, "Times New Roman", serif;
+  --menu-heading-weight: 500;
+  --menu-heading-tracking: 0;
+}
+
+[data-menu-theme="modern"] {
+  --menu-bg: oklch(0.165 0.006 265);
+  --menu-bg-glow: oklch(0.26 0.02 265);
+  --menu-fg: oklch(0.96 0.002 260);
+  --menu-muted: oklch(0.67 0.012 265);
+  --menu-accent: oklch(0.88 0.19 122);
+  --menu-border: oklch(1 0 0 / 12%);
+  --menu-heading-weight: 700;
+  --menu-heading-tracking: -0.02em;
+}
+
+[data-menu-theme="warm"] {
+  --menu-bg: oklch(0.975 0.017 62);
+  --menu-bg-glow: oklch(0.93 0.05 55);
+  --menu-fg: oklch(0.33 0.045 42);
+  --menu-muted: oklch(0.53 0.035 45);
+  --menu-accent: oklch(0.62 0.16 42);
+  --menu-border: oklch(0.9 0.035 55);
+  --menu-heading-weight: 700;
+  --menu-heading-tracking: -0.015em;
+}
