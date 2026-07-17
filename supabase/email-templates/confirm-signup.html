@@ -1,0 +1,59 @@
+<!--
+  Supabase -> Authentication -> Email Templates -> "Confirm signup"
+  Konu (Subject): MenuQR hesabınızı doğrulayın
+
+  Bu şablon uygulamada FİİLEN kullanılan tek şablondur: lib/actions/auth.ts
+  içindeki signUp() çağrısı bunu tetikler.
+
+  {{ .ConfirmationURL }} kullanıcıyı Supabase'in verify uç noktasına, oradan da
+  signUp'ta verdiğimiz emailRedirectTo adresine (/auth/callback) yönlendirir.
+  Bu yüzden Authentication -> URL Configuration altındaki redirect izin
+  listesinde /auth/callback bulunmak zorunda; yoksa bağlantı hata verir.
+
+  {{ .Data }} = auth.users.user_metadata. full_name'i kayıt sırasında oraya
+  yazıyoruz, ama OAuth ya da elle oluşturulan kullanıcılarda boş olabilir —
+  bu yüzden if ile koruyoruz, aksi halde "Merhaba ," gibi görünürdü.
+-->
+<div style="margin:0;padding:24px;background-color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <div style="max-width:480px;margin:0 auto;background-color:#ffffff;border-radius:12px;padding:32px;">
+
+    <p style="margin:0 0 24px;font-size:18px;font-weight:600;color:#18181b;">MenuQR</p>
+
+    <h1 style="margin:0 0 16px;font-size:20px;font-weight:600;color:#18181b;">
+      {{ if .Data.full_name }}Merhaba {{ .Data.full_name }},{{ else }}Hoş geldiniz,{{ end }}
+    </h1>
+
+    <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#3f3f46;">
+      MenuQR hesabınız neredeyse hazır. Menülerinizi oluşturmaya başlamak için e-posta adresinizi
+      doğrulayın.
+    </p>
+
+    <p style="margin:0 0 24px;">
+      <a href="{{ .ConfirmationURL }}"
+         style="display:inline-block;background-color:#18181b;color:#ffffff;text-decoration:none;font-size:15px;font-weight:500;padding:12px 24px;border-radius:8px;">
+        E-postamı doğrula
+      </a>
+    </p>
+
+    <p style="margin:0 0 8px;font-size:13px;line-height:1.6;color:#71717a;">
+      Buton çalışmıyorsa bu adresi tarayıcınıza yapıştırın:
+    </p>
+    <p style="margin:0 0 24px;font-size:13px;line-height:1.6;word-break:break-all;">
+      <a href="{{ .ConfirmationURL }}" style="color:#3f3f46;">{{ .ConfirmationURL }}</a>
+    </p>
+
+    <hr style="border:none;border-top:1px solid #e4e4e7;margin:0 0 16px;" />
+
+    <!--
+      Bilerek süre yazılmadı. Bağlantının ömrü Supabase Auth ayarlarından
+      değiştirilebilir; metne "24 saat" gibi sabit bir sayı yazarsanız ayarı
+      değiştirdiğiniz an e-posta kullanıcıya yanlış bilgi verir. Sayı yazacaksanız
+      ayarla senkron tutmak sizin sorumluluğunuz.
+    -->
+    <p style="margin:0;font-size:13px;line-height:1.6;color:#71717a;">
+      Bu bağlantı belirli bir süre sonra geçersiz olur. Bu hesabı siz oluşturmadıysanız bu e-postayı
+      yoksayabilirsiniz — hiçbir işlem yapılmaz.
+    </p>
+
+  </div>
+</div>
