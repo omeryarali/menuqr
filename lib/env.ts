@@ -8,7 +8,15 @@ import { z } from "zod";
 const schema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url("NEXT_PUBLIC_SUPABASE_URL must be a full URL"),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, "NEXT_PUBLIC_SUPABASE_ANON_KEY is required"),
-  NEXT_PUBLIC_SITE_URL: z.string().url("NEXT_PUBLIC_SITE_URL must be a full URL"),
+  // Trailing slash stripped on purpose: every consumer builds `${SITE_URL}/path`,
+  // so a pasted "https://host/" would produce "https://host//path". That
+  // double slash 308-redirects for pages but can fail Supabase's redirect
+  // allow-list match for auth emails — and a printed QR pointing at it is
+  // permanent. Normalize once here so no caller has to care.
+  NEXT_PUBLIC_SITE_URL: z
+    .string()
+    .url("NEXT_PUBLIC_SITE_URL must be a full URL")
+    .transform((value) => value.replace(/\/+$/, "")),
 });
 
 const parsed = schema.safeParse({
