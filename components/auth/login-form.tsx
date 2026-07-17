@@ -17,6 +17,10 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "";
 
+  // Set by /auth/callback when a confirmation/recovery link fails (expired,
+  // already used). Shown until the user submits, then the action state wins.
+  const callbackError = searchParams.get("error");
+
   const fieldErrors = state.status === "error" ? state.fieldErrors : undefined;
 
   return (
@@ -26,6 +30,10 @@ export function LoginForm() {
       {state.status === "error" && !fieldErrors ? (
         <Alert variant="destructive">
           <AlertDescription>{state.message}</AlertDescription>
+        </Alert>
+      ) : state.status === "idle" && callbackError ? (
+        <Alert variant="destructive">
+          <AlertDescription>{callbackError}</AlertDescription>
         </Alert>
       ) : null}
 
