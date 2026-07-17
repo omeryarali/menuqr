@@ -4,28 +4,68 @@ import { createClient } from "@/lib/supabase/server";
 import type { Restaurant } from "@/types/database";
 
 /**
- * Data access for restaurants.
+ * Owner-facing data access for restaurants.
  *
- * None of these functions filter by owner. They don't need to: RLS scopes
- * every query to the caller's own rows, so a bad id returns empty rather than
- * someone else's data. Keep it that way — a WHERE owner_id clause here would
- * imply the isolation lives in application code, and it does not.
+ * These MUST filter by owner_id explicitly. It is tempting to lean on RLS
+ * alone, but `restaurants` has a public-read policy granted to `authenticated`
+ * as well as `anon` (so a signed-in user can view anyone's published menu).
+ * That means an unscoped `select("*")` returns the caller's own rows PLUS every
+ * other owner's *published* restaurant — which is correct for the public menu,
+ * but wrong for a dashboard that must show only "my restaurants". RLS is the
+ * security boundary (it still blocks writes and hides drafts); the owner filter
+ * here is what makes these reads mean "mine".
  */
+
+async function currentUserId(supabase: Awaited<ReturnType<typeof createClient>>): Promise<string | null> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user?.id ?? null;
+}
 
 export async function listRestaurants(): Promise<Restaurant[]> {
   const supabase = await createClient();
+  const uid = await currentUserId(supabase);
+  if (!uid) return [];
+
   const { data, error } = await supabase
     .from("restaurants")
     .select("*")
+    .eq("owner_id", uid)
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(`Failed to load restaurants: ${error.message}`);
   return data ?? [];
 }
 
+/**
+ * IDs of the restaurants the caller owns. The scoping key for categories and
+ * products, which carry restaurant_id but no owner_id of their own.
+ */
+export async function listOwnedRestaurantIds(): Promise<string[]> {
+  const supabase = await createClient();
+  const uid = await currentUserId(supabase);
+  if (!uid) return [];
+
+  const { data, error } = await supabase.from("restaurants").select("id").eq("owner_id", uid);
+  if (error) throw new Error(`Failed to load restaurant ids: ${error.message}`);
+  return (data ?? []).map((row) => row.id);
+}
+
 export async function getRestaurant(id: string): Promise<Restaurant | null> {
   const supabase = await createClient();
-  const { data, error } = await supabase.from("restaurants").select("*").eq("id", id).maybeSingle();
+  const uid = await currentUserId(supabase);
+  if (!uid) return null;
+
+  // owner_id filter, not just id: without it the dashboard detail/edit page
+  // would open for any *published* restaurant (RLS permits the read), showing
+  // another owner's edit form even though the save would be rejected.
+  const { data, error } = await supabase
+    .from("restaurants")
+    .select("*")
+    .eq("id", id)
+    .eq("owner_id", uid)
+    .maybeSingle();
 
   if (error) throw new Error(`Failed to load restaurant: ${error.message}`);
   return data;

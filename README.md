@@ -65,17 +65,20 @@ fail silently after the second attempt. See `supabase/email-templates/README.md`
 
 ## How isolation works
 
-Tenant isolation is enforced by Postgres RLS, not by application code. Queries in `services/` don't
-filter by owner — they don't need to, and adding a `WHERE owner_id` would imply the security lives
-in the app layer when it doesn't.
+RLS is the security boundary — it blocks writes to rows you don't own and hides unpublished data.
+But it is not the whole story for *reads*, and conflating the two causes a subtle leak:
 
 - `restaurants` is the tenant boundary; everything else hangs off `restaurant_id`.
-- Owners read/write only their own rows. Anonymous visitors read only rows of **published**
-  restaurants.
+- Public-read policies are granted to `anon` **and** `authenticated` — otherwise signing in would
+  take away access the general public has (a logged-in user must still be able to view any published
+  menu).
+- The catch: that same policy means an authenticated user's unscoped `select("*")` returns their own
+  rows **plus every other owner's published rows**. Correct for the public menu; wrong for the
+  dashboard. So the **owner-facing services filter by owner explicitly** (`listRestaurants`,
+  `getRestaurant`, `listCategories`, `listProducts`), while `services/menu.ts` stays unscoped on
+  purpose. RLS still guarantees nobody can *write* across tenants or read *drafts*.
 - `products.restaurant_id` is denormalized (so policies don't join) and force-synced from its
   category by a trigger, so it can't be forged or drift.
-- Public-read policies are granted to `anon` **and** `authenticated` — otherwise signing in would
-  take away access the general public has.
 
 Because the owner can also read their own unpublished restaurant, `/menu/{slug}` doubles as a live
 draft preview. That's why the page is `force-dynamic`: a cached copy would leak a draft to the next

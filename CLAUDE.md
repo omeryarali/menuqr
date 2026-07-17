@@ -35,8 +35,14 @@ page/action → `services/*` or `lib/actions/*` → Supabase → RLS decides wha
 
 **Layers:**
 
-- `services/` — server-only reads. Never filter by owner; RLS already scopes rows to the caller.
-  Adding `WHERE owner_id` would falsely imply isolation is enforced in app code.
+- `services/` — server-only reads. **Owner-facing reads must filter by owner explicitly**
+  (`listRestaurants`, `getRestaurant`, `listCategories`, `listProducts` all do). RLS is the security
+  boundary, but `restaurants`/`categories`/`products` each carry a public-read policy granted to
+  `authenticated` too, so an unscoped `select("*")` returns the caller's own rows PLUS every other
+  owner's *published* rows. That's correct for the public menu (`services/menu.ts`, deliberately
+  unscoped) and wrong for the dashboard. categories/products have no `owner_id`, so they scope via
+  `listOwnedRestaurantIds()`. Don't "simplify" these back to relying on RLS alone — that reintroduces
+  a cross-tenant leak into the dashboard.
 - `lib/actions/` — server-only writes. Return `ActionState` (`lib/actions/types.ts`) instead of
   throwing, so forms can show the real message; only unexpected faults throw.
 - `lib/validators/` — zod schemas mirroring the DB's CHECK constraints.
