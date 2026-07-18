@@ -58,6 +58,10 @@ rather than inline sub-selects, which would nest policy evaluation and recurse.
 - **shadcn/ui here is the Base UI build** (`style: base-nova`), not Radix. There is no `asChild`.
   Use `render={<Link href="…" />}` and put children on the outer component. Check
   `components/ui/*.tsx` for the real prop names before writing markup against remembered Radix APIs.
+  Structure differs too, not just props: `DropdownMenuLabel` is Base UI's `Menu.GroupLabel` and
+  **throws at menu-open** ("Base UI error #31") unless wrapped in `DropdownMenuGroup` — Radix
+  tolerated a bare Label. When a Base UI popup crashes the error boundary on open, suspect a
+  missing structural parent before anything else.
 - **`middleware.ts` does not exist** — Next 16 renamed the convention to `proxy.ts`. Having both is
   a hard build error.
 - **`types/database.ts` is hand-maintained.** Every table needs a `Relationships` key and the schema
