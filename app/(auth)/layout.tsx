@@ -14,8 +14,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             "radial-gradient(45% 45% at 50% 0%, color-mix(in oklch, var(--primary) 10%, transparent), transparent 70%)",
         }}
       />
-      <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
-        <QrCode className="size-5" aria-hidden />
+      <Link href="/" className="flex items-center gap-2.5 text-lg font-semibold">
+        <span className="bg-brand-gradient flex size-8 items-center justify-center rounded-lg text-white">
+          <QrCode className="size-4.5" aria-hidden />
+        </span>
         MenuQR
       </Link>
       <div className="w-full max-w-sm">{children}</div>

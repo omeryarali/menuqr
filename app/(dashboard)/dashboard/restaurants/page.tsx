@@ -42,7 +42,7 @@ export default async function RestaurantsPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {restaurants.map((restaurant) => (
             <Link key={restaurant.id} href={`/dashboard/restaurants/${restaurant.id}`} className="group">
-              <Card className="h-full transition-colors group-hover:border-foreground/20">
+              <Card className="group-hover:border-primary/40 h-full transition-colors">
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="truncate">{restaurant.name}</CardTitle>

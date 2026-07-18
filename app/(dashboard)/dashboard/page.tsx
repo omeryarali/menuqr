@@ -60,13 +60,15 @@ export default async function DashboardPage() {
           <div className="grid gap-4 sm:grid-cols-3">
             {stats.map(({ label, value, icon: Icon, href }) => (
               <Link key={label} href={href}>
-                <Card className="hover:border-foreground/20 transition-colors">
+                <Card className="hover:border-primary/40 transition-colors">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-muted-foreground text-sm font-medium">{label}</CardTitle>
-                    <Icon className="text-muted-foreground size-4" aria-hidden />
+                    <span className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
+                      <Icon className="size-4" aria-hidden />
+                    </span>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-3xl font-semibold">{value}</p>
+                    <p className="text-3xl font-semibold tracking-tight">{value}</p>
                   </CardContent>
                 </Card>
               </Link>

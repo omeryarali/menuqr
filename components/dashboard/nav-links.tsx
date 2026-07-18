@@ -15,6 +15,11 @@ const LINKS = [
   { href: "/dashboard/qr-codes", label: "Karekodlar", icon: QrCode },
 ] as const;
 
+/**
+ * Styled with the sidebar-* tokens (dark indigo surface), so it renders
+ * correctly both in the fixed sidebar and in the mobile sheet — both are
+ * bg-sidebar. Don't reuse this on a light surface.
+ */
 export function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 
@@ -31,13 +36,13 @@ export function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               isActive
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                : "text-sidebar-foreground/65 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
             )}
           >
-            <Icon className="size-4" aria-hidden />
+            <Icon className={cn("size-4", isActive && "text-sidebar-primary")} aria-hidden />
             {label}
           </Link>
         );

@@ -34,14 +34,16 @@ export default async function HomePage() {
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px]"
         style={{
           background:
-            "radial-gradient(50% 60% at 50% 0%, color-mix(in oklch, var(--primary) 12%, transparent), transparent 70%)",
+            "radial-gradient(50% 60% at 50% 0%, color-mix(in oklch, var(--primary) 16%, transparent), transparent 70%)",
         }}
       />
 
       <header className="bg-background/70 sticky top-0 z-30 border-b backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4 lg:px-8">
-          <span className="flex items-center gap-2 font-semibold">
-            <QrCode className="size-5" aria-hidden />
+          <span className="flex items-center gap-2.5 font-semibold">
+            <span className="bg-brand-gradient flex size-7 items-center justify-center rounded-lg text-white">
+              <QrCode className="size-4" aria-hidden />
+            </span>
             MenuQR
           </span>
           <nav className="flex items-center gap-2">
@@ -129,8 +131,8 @@ export default async function HomePage() {
           <h2 className="text-center text-2xl font-semibold tracking-tight">Üç adımda yayında</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {STEPS.map((step, index) => (
-              <div key={step.title} className="bg-card rounded-xl border p-6">
-                <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-lg">
+              <div key={step.title} className="bg-card hover:border-primary/40 rounded-xl border p-6 transition-colors">
+                <div className="bg-brand-gradient flex size-10 items-center justify-center rounded-lg text-white">
                   <step.icon className="size-5" aria-hidden />
                 </div>
                 <div className="mt-4 flex items-center gap-2">
