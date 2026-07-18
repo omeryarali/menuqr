@@ -48,77 +48,81 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Brand: modern indigo/violet. Every value carries a hint of hue 275–295 so
-   surfaces feel intentional rather than default-gray; the public menu themes
-   are unaffected (they read --menu-* variables only). */
+/* Brand: appetizing red + warm gold on cream — the palette recommended by the
+   MenuQR design system (design-system/menuqr/MASTER.md, "Vibrant &
+   Block-based" style for restaurant/culinary SaaS). Every surface carries a
+   warm hue so nothing reads default-gray. The public menu themes are
+   unaffected — they read --menu-* variables only. */
 :root {
-  --background: oklch(0.985 0.004 286);
-  --foreground: oklch(0.19 0.024 281);
+  --background: oklch(0.971 0.013 17.38);
+  --foreground: oklch(0.258 0.092 26.042);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.19 0.024 281);
+  --card-foreground: oklch(0.258 0.092 26.042);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.19 0.024 281);
-  --primary: oklch(0.52 0.235 279);
-  --primary-foreground: oklch(0.985 0.005 286);
-  --secondary: oklch(0.955 0.013 283);
-  --secondary-foreground: oklch(0.28 0.07 280);
-  --muted: oklch(0.955 0.011 283);
-  --muted-foreground: oklch(0.5 0.03 282);
-  --accent: oklch(0.94 0.026 283);
-  --accent-foreground: oklch(0.3 0.09 280);
+  --popover-foreground: oklch(0.258 0.092 26.042);
+  --primary: oklch(0.577 0.245 27.325);
+  --primary-foreground: oklch(0.985 0.008 30);
+  --secondary: oklch(0.936 0.032 17.717);
+  --secondary-foreground: oklch(0.396 0.141 25.723);
+  --muted: oklch(0.957 0.012 20);
+  --muted-foreground: oklch(0.51 0.045 25);
+  /* Accent is the warm gold — hover surfaces and highlights, not danger. */
+  --accent: oklch(0.962 0.059 95.617);
+  --accent-foreground: oklch(0.476 0.114 61.907);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.906 0.015 282);
-  --input: oklch(0.906 0.015 282);
-  --ring: oklch(0.62 0.17 279);
-  --chart-1: oklch(0.52 0.235 279);
-  --chart-2: oklch(0.62 0.2 285);
-  --chart-3: oklch(0.72 0.15 290);
-  --chart-4: oklch(0.8 0.1 292);
-  --chart-5: oklch(0.88 0.055 294);
-  --radius: 0.75rem;
-  /* Sidebar is deliberately dark indigo — the shell frames the light content. */
-  --sidebar: oklch(0.23 0.05 281);
-  --sidebar-foreground: oklch(0.94 0.012 286);
-  --sidebar-primary: oklch(0.72 0.16 283);
-  --sidebar-primary-foreground: oklch(0.985 0.005 286);
+  --border: oklch(0.885 0.062 18.334);
+  --input: oklch(0.885 0.062 18.334);
+  --ring: oklch(0.637 0.237 25.331);
+  --chart-1: oklch(0.577 0.245 27.325);
+  --chart-2: oklch(0.704 0.191 22.216);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.554 0.135 66.442);
+  --chart-5: oklch(0.396 0.141 25.723);
+  --radius: 0.875rem;
+  /* Sidebar is deep maroon — the dark shell that frames the cream content;
+     active icons pick up the gold via --sidebar-primary. */
+  --sidebar: oklch(0.245 0.075 27);
+  --sidebar-foreground: oklch(0.955 0.018 40);
+  --sidebar-primary: oklch(0.75 0.14 75);
+  --sidebar-primary-foreground: oklch(0.985 0.008 30);
   --sidebar-accent: oklch(1 0 0 / 10%);
-  --sidebar-accent-foreground: oklch(0.985 0.008 286);
+  --sidebar-accent-foreground: oklch(0.985 0.01 35);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.66 0.19 281);
+  --sidebar-ring: oklch(0.75 0.14 75);
 }
 
 .dark {
-  --background: oklch(0.17 0.021 282);
-  --foreground: oklch(0.95 0.01 286);
-  --card: oklch(0.21 0.026 282);
-  --card-foreground: oklch(0.95 0.01 286);
-  --popover: oklch(0.21 0.026 282);
-  --popover-foreground: oklch(0.95 0.01 286);
-  --primary: oklch(0.68 0.19 280);
-  --primary-foreground: oklch(0.15 0.03 281);
-  --secondary: oklch(0.27 0.032 282);
-  --secondary-foreground: oklch(0.95 0.01 286);
-  --muted: oklch(0.27 0.032 282);
-  --muted-foreground: oklch(0.71 0.022 284);
-  --accent: oklch(0.3 0.05 281);
-  --accent-foreground: oklch(0.96 0.01 286);
+  --background: oklch(0.168 0.032 26);
+  --foreground: oklch(0.955 0.015 35);
+  --card: oklch(0.205 0.042 26);
+  --card-foreground: oklch(0.955 0.015 35);
+  --popover: oklch(0.205 0.042 26);
+  --popover-foreground: oklch(0.955 0.015 35);
+  --primary: oklch(0.66 0.21 25);
+  --primary-foreground: oklch(0.19 0.06 26);
+  --secondary: oklch(0.27 0.055 26);
+  --secondary-foreground: oklch(0.955 0.015 35);
+  --muted: oklch(0.27 0.05 26);
+  --muted-foreground: oklch(0.72 0.035 30);
+  --accent: oklch(0.32 0.07 65);
+  --accent-foreground: oklch(0.9 0.1 85);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.6 0.15 280);
-  --chart-1: oklch(0.68 0.19 280);
-  --chart-2: oklch(0.6 0.21 285);
-  --chart-3: oklch(0.52 0.22 290);
-  --chart-4: oklch(0.45 0.19 292);
-  --chart-5: oklch(0.38 0.14 294);
-  --sidebar: oklch(0.2 0.04 281);
-  --sidebar-foreground: oklch(0.94 0.012 286);
-  --sidebar-primary: oklch(0.72 0.16 283);
-  --sidebar-primary-foreground: oklch(0.985 0.005 286);
+  --ring: oklch(0.6 0.18 26);
+  --chart-1: oklch(0.66 0.21 25);
+  --chart-2: oklch(0.75 0.15 40);
+  --chart-3: oklch(0.8 0.15 75);
+  --chart-4: oklch(0.62 0.13 65);
+  --chart-5: oklch(0.5 0.16 26);
+  --sidebar: oklch(0.185 0.045 26);
+  --sidebar-foreground: oklch(0.945 0.015 35);
+  --sidebar-primary: oklch(0.78 0.13 78);
+  --sidebar-primary-foreground: oklch(0.985 0.008 30);
   --sidebar-accent: oklch(1 0 0 / 10%);
-  --sidebar-accent-foreground: oklch(0.985 0.008 286);
+  --sidebar-accent-foreground: oklch(0.985 0.01 35);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.66 0.19 281);
+  --sidebar-ring: oklch(0.78 0.13 78);
 }
 
 @layer base {
@@ -134,9 +138,16 @@
 }
 
 @layer utilities {
-  /* Brand mark background — logo chips and the landing step icons. */
+  /* Brand mark background — logo chips and the landing step icons.
+     Appetizing red into warm gold, per the MASTER.md palette. */
   .bg-brand-gradient {
-    background-image: linear-gradient(135deg, oklch(0.585 0.22 275), oklch(0.55 0.26 295));
+    background-image: linear-gradient(135deg, oklch(0.62 0.23 28), oklch(0.71 0.15 65));
+  }
+
+  /* Display serif for hero/section headings (Playfair Display SC). Body and
+     app UI stay on Karla — small-caps serif is illegible at UI sizes. */
+  .font-display {
+    font-family: var(--font-display), Georgia, serif;
   }
 }
 

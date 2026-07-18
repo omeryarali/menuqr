@@ -21,7 +21,7 @@ export default async function UpdatePasswordPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Yeni şifre belirleyin</CardTitle>
+        <CardTitle className="font-display text-2xl">Yeni şifre belirleyin</CardTitle>
         <CardDescription>Hesabınız için yeni bir şifre seçin.</CardDescription>
       </CardHeader>
       <CardContent>

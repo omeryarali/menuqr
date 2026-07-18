@@ -73,7 +73,7 @@ export default async function HomePage() {
               <span className="bg-primary size-1.5 rounded-full" />
               Kurulumu 5 dakika
             </span>
-            <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
+            <h1 className="font-display text-4xl leading-tight font-bold text-balance sm:text-5xl lg:text-6xl">
               Uğraşmadan QR menü.
             </h1>
             <p className="text-muted-foreground max-w-prose text-lg text-pretty">
@@ -93,8 +93,8 @@ export default async function HomePage() {
           {/* Phone-ish preview of a themed menu with a QR chip. */}
           <div className="relative mx-auto w-full max-w-sm">
             <div
-              className="rounded-3xl border p-6 shadow-xl"
-              style={{ backgroundColor: "#f7f2e9", borderColor: "#e6dcc9", color: "#2b2118" }}
+              className="rounded-3xl border-2 p-6 shadow-xl"
+              style={{ backgroundColor: "#fdfaf4", borderColor: "#e6d3c2", color: "#2b2118" }}
             >
               <div className="space-y-1 text-center">
                 <p className="text-2xl font-semibold" style={{ fontFamily: "Georgia, serif" }}>
@@ -120,7 +120,7 @@ export default async function HomePage() {
               </div>
             </div>
             {/* QR chip peeking from the corner. */}
-            <div className="bg-background absolute -bottom-4 -right-3 flex size-20 items-center justify-center rounded-2xl border shadow-lg">
+            <div className="bg-card absolute -bottom-4 -right-3 flex size-20 items-center justify-center rounded-2xl border-2 shadow-lg">
               <QrCode className="size-12" aria-hidden />
             </div>
           </div>
@@ -128,16 +128,19 @@ export default async function HomePage() {
 
         {/* Steps */}
         <section id="nasil" className="scroll-mt-20 border-t py-16 lg:py-20">
-          <h2 className="text-center text-2xl font-semibold tracking-tight">Üç adımda yayında</h2>
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          <h2 className="font-display text-center text-3xl font-bold">Üç adımda yayında</h2>
+          <div className="mt-10 grid gap-5 sm:grid-cols-3">
             {STEPS.map((step, index) => (
-              <div key={step.title} className="bg-card hover:border-primary/40 rounded-xl border p-6 transition-colors">
-                <div className="bg-brand-gradient flex size-10 items-center justify-center rounded-lg text-white">
+              <div
+                key={step.title}
+                className="bg-card hover:border-primary/50 rounded-2xl border-2 p-6 transition-all hover:shadow-lg"
+              >
+                <div className="bg-brand-gradient flex size-11 items-center justify-center rounded-xl text-white">
                   <step.icon className="size-5" aria-hidden />
                 </div>
                 <div className="mt-4 flex items-center gap-2">
-                  <span className="text-muted-foreground text-sm font-medium tabular-nums">0{index + 1}</span>
-                  <h3 className="font-medium">{step.title}</h3>
+                  <span className="text-accent-foreground text-sm font-bold tabular-nums">0{index + 1}</span>
+                  <h3 className="font-semibold">{step.title}</h3>
                 </div>
                 <p className="text-muted-foreground mt-1.5 text-sm text-pretty">{step.body}</p>
               </div>

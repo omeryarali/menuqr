@@ -13,7 +13,7 @@ export default function LoginPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tekrar hoş geldiniz</CardTitle>
+        <CardTitle className="font-display text-2xl">Tekrar hoş geldiniz</CardTitle>
         <CardDescription>Menülerinizi yönetmek için giriş yapın.</CardDescription>
       </CardHeader>
       <CardContent>

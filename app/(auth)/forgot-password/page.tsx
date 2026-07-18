@@ -11,7 +11,7 @@ export default function ForgotPasswordPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Şifrenizi mi unuttunuz?</CardTitle>
+        <CardTitle className="font-display text-2xl">Şifrenizi mi unuttunuz?</CardTitle>
         <CardDescription>
           E-posta adresinizi girin, size bir sıfırlama bağlantısı gönderelim.
         </CardDescription>

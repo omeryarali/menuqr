@@ -11,7 +11,7 @@ export default function RegisterPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Hesabınızı oluşturun</CardTitle>
+        <CardTitle className="font-display text-2xl">Hesabınızı oluşturun</CardTitle>
         <CardDescription>Dakikalar içinde QR menünüzü yayına alın.</CardDescription>
       </CardHeader>
       <CardContent>
