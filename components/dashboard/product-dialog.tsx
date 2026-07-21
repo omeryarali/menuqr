@@ -90,9 +90,12 @@ export function ProductDialog({ categories, product, defaultCategoryId, nextPosi
 
           <div className="space-y-2">
             <Label htmlFor="categoryId">Kategori</Label>
+            {/* items = value→label map so the trigger shows the category name,
+                not its UUID (Base UI SelectValue doesn't auto-resolve labels). */}
             <Select
               name="categoryId"
               defaultValue={product?.category_id ?? defaultCategoryId ?? categories[0]?.id}
+              items={Object.fromEntries(categories.map((c) => [c.id, c.name]))}
               required
             >
               <SelectTrigger id="categoryId">

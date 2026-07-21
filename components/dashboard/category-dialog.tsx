@@ -105,7 +105,15 @@ export function CategoryDialog({ restaurants, category, defaultRestaurantId, nex
           ) : (
             <div className="space-y-2">
               <Label htmlFor="restaurantId">Restoran</Label>
-              <Select name="restaurantId" defaultValue={restaurantId} required>
+              {/* items = value→label map. Base UI's SelectValue renders the raw
+                  value (a UUID here) unless it can resolve the label from this
+                  map — Radix showed the item text automatically, Base UI does not. */}
+              <Select
+                name="restaurantId"
+                defaultValue={restaurantId}
+                items={Object.fromEntries(restaurants.map((r) => [r.id, r.name]))}
+                required
+              >
                 <SelectTrigger id="restaurantId">
                   <SelectValue placeholder="Bir restoran seçin" />
                 </SelectTrigger>

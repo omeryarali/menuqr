@@ -75,8 +75,13 @@ export function QrCard({
 
         <div className="flex items-center gap-2">
           {/* Base UI emits null when a selection is cleared; this Select has no
-              clear affordance, so ignore it rather than widening the state. */}
-          <Select value={size} onValueChange={(value) => value && setSize(value)}>
+              clear affordance, so ignore it rather than widening the state.
+              items map so the trigger shows "512px", not the bare value "512". */}
+          <Select
+            value={size}
+            onValueChange={(value) => value && setSize(value)}
+            items={Object.fromEntries(SIZES.map((s) => [String(s), `${s}px`]))}
+          >
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>

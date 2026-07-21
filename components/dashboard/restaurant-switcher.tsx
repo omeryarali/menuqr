@@ -29,8 +29,11 @@ export function RestaurantSwitcher({ restaurants }: { restaurants: Restaurant[] 
     router.push(query ? `${pathname}?${query}` : pathname);
   }
 
+  // value→label map so the trigger shows the restaurant name, not its UUID.
+  const items = { all: "Tüm restoranlar", ...Object.fromEntries(restaurants.map((r) => [r.id, r.name])) };
+
   return (
-    <Select value={current} onValueChange={handleChange}>
+    <Select value={current} onValueChange={handleChange} items={items}>
       <SelectTrigger className="w-full sm:w-64">
         <SelectValue placeholder="Tüm restoranlar" />
       </SelectTrigger>
