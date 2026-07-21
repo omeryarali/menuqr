@@ -61,7 +61,9 @@ rather than inline sub-selects, which would nest policy evaluation and recurse.
   Structure differs too, not just props: `DropdownMenuLabel` is Base UI's `Menu.GroupLabel` and
   **throws at menu-open** ("Base UI error #31") unless wrapped in `DropdownMenuGroup` — Radix
   tolerated a bare Label. When a Base UI popup crashes the error boundary on open, suspect a
-  missing structural parent before anything else.
+  missing structural parent before anything else. A `Select` whose trigger shows the raw value
+  (e.g. a UUID) instead of the item label needs an `items={{ value: label }}` map on `Select` —
+  Base UI's `SelectValue` resolves the label from that map, Radix read it from the rendered item.
 - **`middleware.ts` does not exist** — Next 16 renamed the convention to `proxy.ts`. Having both is
   a hard build error.
 - **`types/database.ts` is hand-maintained.** Every table needs a `Relationships` key and the schema
