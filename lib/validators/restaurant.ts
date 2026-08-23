@@ -18,7 +18,7 @@ export const restaurantSchema = z.object({
   isPublished: z.boolean(),
   // Mirrors the CHECK in 0003_theme.sql. Unknown values fall back rather than
   // erroring, so a stale form can't block a save.
-  theme: z.enum(["classic", "modern", "warm"]).catch("classic"),
+  theme: z.enum(["classic", "modern", "warm", "dark-lux"]).catch("classic"),
 });
 
 export type RestaurantInput = z.infer<typeof restaurantSchema>;

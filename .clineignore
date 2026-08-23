@@ -1,0 +1,5 @@
+node_modules/
+.next/
+.claude/
+package-lock.json
+.env.local

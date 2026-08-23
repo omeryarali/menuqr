@@ -25,6 +25,12 @@ export const MENU_THEMES = [
     description: "Sıcak turuncu tonları, samimi ve davetkâr. Ailece mekânlar.",
     swatch: { bg: "#fff6ee", fg: "#3d2415", accent: "#e0602f" },
   },
+  {
+    id: "dark-lux",
+    label: "Lüks Koyu",
+    description: "Koyu antrasit zemin ve altın sarısı vurgular. Seçkin ve asil bir hava.",
+    swatch: { bg: "#121212", fg: "#f5f5f5", accent: "#D4AF37" },
+  },
 ] as const;
 
 export type MenuThemeId = (typeof MENU_THEMES)[number]["id"];
