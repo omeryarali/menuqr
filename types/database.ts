@@ -164,11 +164,31 @@ export interface Database {
         };
         Relationships: [];
       };
+      menu_events: {
+        Row: {
+          id: string;
+          restaurant_id: string;
+          event_type: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          restaurant_id: string;
+          event_type: string;
+        };
+        /** Events are immutable — no update path. */
+        Update: Record<never, never>;
+        Relationships: [];
+      };
     };
     Views: Record<never, never>;
     Functions: {
       is_restaurant_owner: { Args: { p_restaurant_id: string }; Returns: boolean };
       is_restaurant_published: { Args: { p_restaurant_id: string }; Returns: boolean };
+      menu_event_daily_counts: {
+        Args: { p_days?: number; p_restaurant_id?: string | null };
+        Returns: { day: string; event_type: string; event_count: number }[];
+      };
     };
     Enums: Record<never, never>;
     CompositeTypes: Record<never, never>;
@@ -180,6 +200,10 @@ export type Restaurant = Database["public"]["Tables"]["restaurants"]["Row"];
 export type Category = Database["public"]["Tables"]["categories"]["Row"];
 export type Product = Database["public"]["Tables"]["products"]["Row"];
 export type QrCode = Database["public"]["Tables"]["qr_codes"]["Row"];
+export type MenuEvent = Database["public"]["Tables"]["menu_events"]["Row"];
+
+/** The two things we count on the public menu. */
+export type MenuEventType = "view" | "qr_scan";
 
 /** A category with its products attached — the shape the public menu renders. */
 export type CategoryWithProducts = Category & { products: Product[] };

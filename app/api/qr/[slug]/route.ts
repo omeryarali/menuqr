@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { env } from "@/lib/env";
-import { clampSize, renderQrPng, renderQrSvg, type QrFormat } from "@/lib/qr";
+import { clampSize, qrTargetUrl, renderQrPng, renderQrSvg, type QrFormat } from "@/lib/qr";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -35,7 +34,8 @@ export async function GET(request: NextRequest, context: { params: Promise<{ slu
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const target = `${env.NEXT_PUBLIC_SITE_URL}/menu/${restaurant.slug}`;
+  // Carries ?src=qr so scans are distinguishable from ordinary visits.
+  const target = qrTargetUrl(restaurant.slug);
   const filename = `${restaurant.slug}-qr.${format}`;
   const disposition = searchParams.get("download") === "1" ? "attachment" : "inline";
 

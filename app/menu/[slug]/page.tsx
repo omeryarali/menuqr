@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { MenuHeader } from "@/components/menu/menu-header";
 import { MenuSection } from "@/components/menu/menu-section";
+import { MenuTracker } from "@/components/menu/menu-tracker";
 import { resolveTheme } from "@/lib/themes";
 import { getPublicMenu } from "@/services/menu";
 
@@ -59,6 +60,10 @@ export default async function PublicMenuPage({ params }: Props) {
           opacity: 0.7,
         }}
       />
+
+      {/* Records the visit client-side; the API skips the owner's own previews
+          and unpublished menus. Renders nothing. */}
+      <MenuTracker slug={menu.slug} />
 
       <div className="relative mx-auto flex min-h-svh w-full max-w-2xl flex-col gap-10 px-5 py-10 sm:px-6">
         {!menu.is_published ? (

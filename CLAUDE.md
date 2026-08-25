@@ -97,8 +97,24 @@ strings go in Turkish, inline. `<html lang="tr">`.
 - Supabase auth emails are **not** covered by any of this; they're configured in the Supabase
   dashboard (Authentication → Email Templates) and ship in English by default.
 
+## Analytics
+
+`menu_events` (migration `0005`) is an append-only log of public-menu opens. Its RLS is deliberately
+asymmetric and is the reason the design works: **anon can INSERT but never SELECT**, the owner can
+SELECT only their own. There is no UPDATE/DELETE policy, so events are immutable.
+
+- Recorded client-side (`components/menu/menu-tracker.tsx` → `/api/track`), not during the server
+  render — the render also runs for crawlers and link-preview bots, which would inflate every number.
+- `/api/track` always answers 204 so it can't be used to probe which slugs exist, and it skips the
+  owner's own previews.
+- A scan is only distinguishable from an ordinary visit by the `?src=qr` marker that `qrTargetUrl()`
+  bakes into the QR image. `menuUrl()` (shown/copied in the dashboard) stays clean on purpose —
+  keep the two apart or shared links start counting as scans.
+- `menu_event_daily_counts` is SECURITY **INVOKER** so the caller's RLS still applies. Never convert
+  it to DEFINER — that would expose every tenant's traffic.
+
 ## Out of scope
 
-Theme builder, analytics, subscriptions, multi-user roles, image upload (products take a URL). The
-`qr_codes` table is provisioned but unwritten — codes derive from the slug via `/api/qr/{slug}`.
-Don't build on `qr_codes.scan_count`; it is always 0.
+Theme builder, subscriptions, multi-user roles, image upload (products take a URL). The `qr_codes`
+table is provisioned but unwritten — codes derive from the slug via `/api/qr/{slug}`. Don't build on
+`qr_codes.scan_count`; it is always 0 and analytics live in `menu_events` instead.

@@ -84,10 +84,20 @@ Because the owner can also read their own unpublished restaurant, `/menu/{slug}`
 draft preview. That's why the page is `force-dynamic`: a cached copy would leak a draft to the next
 visitor.
 
+## Analytics
+
+`/dashboard/analytics` shows menu views and QR scans per restaurant. Visits are recorded from the
+browser (not the server render, which bots also trigger), the owner's own previews are skipped, and
+unpublished menus record nothing.
+
+A QR scan is only distinguishable from a normal visit because the QR image encodes `?src=qr`. Codes
+printed before this shipped still work — their scans just count as plain views. Reprint from
+**Karekodlar** to get scan attribution.
+
 ## What's not here
 
-Deliberately out of scope for the 2-week MVP: theme builder, analytics, subscriptions/billing,
-multi-user roles per restaurant, and image upload/optimization (products take an image **URL**).
+Deliberately out of scope: theme builder, subscriptions/billing, multi-user roles per restaurant, and
+image upload/optimization (products take an image **URL**).
 
 The `qr_codes` table exists but is unwritten — codes are derived from the slug. See the comment in
 `0001_init.sql`.

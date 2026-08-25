@@ -2,7 +2,28 @@ import "server-only";
 
 import QRCode from "qrcode";
 
+import { env } from "@/lib/env";
+
 export type QrFormat = "png" | "svg";
+
+/**
+ * The menu URL a human sees: shown in the dashboard, copied to the clipboard,
+ * shared on WhatsApp. Deliberately clean — a link pasted into a chat is not a
+ * QR scan and must not be counted as one.
+ */
+export function menuUrl(slug: string): string {
+  return `${env.NEXT_PUBLIC_SITE_URL}/menu/${slug}`;
+}
+
+/**
+ * The URL encoded *into* the QR image. The ?src=qr marker is the only way to
+ * tell a scan apart from any other visit — the server sees an identical request
+ * either way. Keep these two functions in sync: if the marker ever changes,
+ * every already-printed code keeps sending the old one.
+ */
+export function qrTargetUrl(slug: string): string {
+  return `${menuUrl(slug)}?src=qr`;
+}
 
 /**
  * Error correction level M tolerates ~15% damage — the practical floor for a

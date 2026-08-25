@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { FolderTree, LayoutDashboard, QrCode, Store, UtensilsCrossed } from "lucide-react";
+import { BarChart3, FolderTree, LayoutDashboard, QrCode, Store, UtensilsCrossed } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/dashboard/categories", label: "Kategoriler", icon: FolderTree },
   { href: "/dashboard/products", label: "Ürünler", icon: UtensilsCrossed },
   { href: "/dashboard/qr-codes", label: "Karekodlar", icon: QrCode },
+  { href: "/dashboard/analytics", label: "Analitik", icon: BarChart3 },
 ] as const;
 
 /**
