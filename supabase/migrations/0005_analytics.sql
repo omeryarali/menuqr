@@ -75,5 +75,11 @@ as $$
   order by 1;
 $$;
 
+-- Belt and braces. SECURITY INVOKER already means an anonymous caller gets an
+-- empty result (no SELECT policy applies to them), but revoking anon's execute
+-- makes the intent explicit and keeps the function harmless if anyone ever
+-- flips it to DEFINER. `revoke ... from public` alone is not enough: Supabase
+-- grants execute to anon explicitly, so anon must be named.
 revoke all on function public.menu_event_daily_counts(integer, uuid) from public;
+revoke all on function public.menu_event_daily_counts(integer, uuid) from anon;
 grant execute on function public.menu_event_daily_counts(integer, uuid) to authenticated;
