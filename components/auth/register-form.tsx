@@ -61,6 +61,14 @@ export function RegisterForm() {
 
       <SubmitButton className="w-full">Hesap oluştur</SubmitButton>
 
+      <p className="text-muted-foreground text-center text-xs">
+        Hesap oluşturarak{" "}
+        <Link href="/gizlilik" className="text-foreground underline underline-offset-4">
+          Gizlilik Politikası ve KVKK Aydınlatma Metni
+        </Link>
+        &apos;ni kabul etmiş olursunuz.
+      </p>
+
       <p className="text-muted-foreground text-center text-sm">
         Zaten hesabınız var mı?{" "}
         <Link href="/login" className="text-foreground underline underline-offset-4">

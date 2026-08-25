@@ -165,7 +165,9 @@ export default async function HomePage() {
             <QrCode className="size-4" aria-hidden />
             MenuQR
           </span>
-          <span>QR menü platformu</span>
+          <Link href="/gizlilik" className="hover:text-foreground">
+            Gizlilik &amp; KVKK
+          </Link>
         </div>
       </footer>
     </div>

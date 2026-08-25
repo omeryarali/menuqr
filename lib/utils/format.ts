@@ -8,3 +8,8 @@ export function formatPrice(amount: number, currency = "TRY", locale = "tr-TR"):
     return `${amount.toFixed(2)} ${currency}`;
   }
 }
+
+/** Tarihi Türkçe uzun biçimde gösterir (örn. "19 Temmuz 2026"). */
+export function formatDate(value: string, locale = "tr-TR"): string {
+  return new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(new Date(value));
+}
