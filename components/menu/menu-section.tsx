@@ -1,5 +1,6 @@
 import { MenuImage } from "@/components/menu/menu-image";
 import { ProductDescription } from "@/components/menu/product-description";
+import { ProductName } from "@/components/menu/product-name";
 import { formatPrice } from "@/lib/utils/format";
 import type { CategoryWithProducts } from "@/types/database";
 
@@ -39,9 +40,7 @@ export function MenuSection({ category, currency }: { category: CategoryWithProd
 
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline gap-2">
-                <h3 className="font-medium" style={{ fontFamily: "var(--menu-heading-font)" }}>
-                  {product.name}
-                </h3>
+                <ProductName productId={product.id} name={product.name} />
                 {!product.is_available ? (
                   <span className="text-[0.7rem] whitespace-nowrap" style={{ color: "var(--menu-muted)" }}>
                     Tükendi

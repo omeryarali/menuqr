@@ -17,14 +17,38 @@ type Supabase = Awaited<ReturnType<typeof createClient>>;
  * under them would stay forever.
  */
 
+/**
+ * Deletes objects and reports the case that has no error attached.
+ *
+ * Storage answers a delete it could not see with `{ data: [], error: null }` —
+ * exactly what an RLS policy that hides the row produces. Treating that as
+ * success is how orphaned files accumulate invisibly (see migration 0007), so
+ * an empty result for a non-empty request is logged as the failure it is.
+ */
+async function removePaths(supabase: Supabase, paths: string[], context: string) {
+  if (paths.length === 0) return;
+
+  const { data, error } = await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(paths);
+
+  if (error) {
+    console.error(`Failed to remove ${context}: ${error.message}`);
+    return;
+  }
+  if (!data?.length) {
+    console.error(
+      `Storage reported no deletions for ${context} (${paths.length} requested) — ` +
+        "the objects are probably hidden by RLS; check the storage policies.",
+    );
+  }
+}
+
 /** Removes one photo, but only when it is a file we uploaded. */
 export async function removeProductImage(supabase: Supabase, url: string | null | undefined) {
   // Returns null for pasted third-party URLs, so we can only delete our own.
   const path = storagePathFromUrl(url);
   if (!path) return;
 
-  const { error } = await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
-  if (error) console.error(`Failed to remove product image ${path}: ${error.message}`);
+  await removePaths(supabase, [path], `product image ${path}`);
 }
 
 /** Removes the photos of every product in a category (call before deleting it). */
@@ -34,10 +58,7 @@ export async function removeImagesForCategory(supabase: Supabase, categoryId: st
     .map((row) => storagePathFromUrl(row.image_url))
     .filter((path): path is string => Boolean(path));
 
-  if (paths.length === 0) return;
-
-  const { error } = await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(paths);
-  if (error) console.error(`Failed to remove category images: ${error.message}`);
+  await removePaths(supabase, paths, `images for category ${categoryId}`);
 }
 
 /**
@@ -58,7 +79,9 @@ export async function removeImagesForRestaurant(supabase: Supabase, restaurantId
   }
   if (!data?.length) return;
 
-  const paths = data.map((file) => `${restaurantId}/${file.name}`);
-  const { error } = await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(paths);
-  if (error) console.error(`Failed to remove restaurant images: ${error.message}`);
+  await removePaths(
+    supabase,
+    data.map((file) => `${restaurantId}/${file.name}`),
+    `images for restaurant ${restaurantId}`,
+  );
 }
