@@ -136,6 +136,21 @@ never let cleanup turn a successful delete into a visible failure.
 Uploads go browser → Storage directly, not through a server action (a 5 MB file would otherwise be
 base64'd into the action payload). Storage RLS is what authorizes the write.
 
+## Dashboard ordering
+
+`position` orders rows *within* a parent — categories within a restaurant, products within a
+category. That is why `/dashboard/products` groups by category before rendering: a flat
+cross-category table would let you drag a row somewhere its new position means nothing.
+
+Drag-and-drop uses `@dnd-kit` (touch + keyboard sensors — owners edit menus from phones). A drop
+rewrites every position from 0 in one statement via the `reorder_categories` / `reorder_products`
+RPCs (migration `0008`), which heals gaps and duplicates left by earlier manual position edits. Both
+RPCs are SECURITY INVOKER, so RLS still filters the rows — never make them DEFINER.
+
+The sortable lists hold their own copy of the rows for the optimistic move and re-sync from props
+**during render**, not in an effect (`react-hooks/set-state-in-effect` would fail, and an effect
+would flash the stale order).
+
 ## Out of scope
 
 Theme builder, subscriptions, multi-user roles. The `qr_codes` table is provisioned but unwritten —

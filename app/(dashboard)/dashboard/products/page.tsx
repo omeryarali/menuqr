@@ -5,14 +5,10 @@ import { Suspense } from "react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { ProductDialog } from "@/components/dashboard/product-dialog";
 import { RestaurantSwitcher } from "@/components/dashboard/restaurant-switcher";
-import { DeleteDialog } from "@/components/shared/delete-dialog";
+import { SortableProductList, type ProductGroup } from "@/components/dashboard/sortable-product-list";
 import { EmptyState } from "@/components/shared/empty-state";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { deleteProduct } from "@/lib/actions/products";
-import { formatPrice } from "@/lib/utils/format";
 import { listCategories } from "@/services/categories";
 import { listProducts } from "@/services/products";
 import { listRestaurants } from "@/services/restaurants";
@@ -47,9 +43,25 @@ export default async function ProductsPage({ searchParams }: Props) {
     );
   }
 
-  // Currency is per-restaurant, so a product's price must be formatted with its
-  // own restaurant's currency — not a single global one.
-  const currencyByRestaurant = new Map(restaurants.map((r) => [r.id, r.currency]));
+  // Grouped by category because `position` orders products *within* a category —
+  // a flat cross-category list would make a drag's new position meaningless.
+  // Categories are already position-sorted by the service, so the groups come
+  // out in menu order. Currency is per-restaurant, never global.
+  const restaurantById = new Map(restaurants.map((r) => [r.id, r]));
+
+  const groups: ProductGroup[] = categories
+    .map((category) => {
+      const restaurant = restaurantById.get(category.restaurant_id);
+      return {
+        category,
+        restaurantName: restaurant?.name ?? "—",
+        currency: restaurant?.currency ?? "TRY",
+        products: products.filter((product) => product.category_id === category.id),
+      };
+    })
+    // An empty category is just noise on this screen; the dialog is how you add
+    // the first product to one.
+    .filter((group) => group.products.length > 0);
 
   return (
     <>
@@ -76,54 +88,7 @@ export default async function ProductsPage({ searchParams }: Props) {
       ) : products.length === 0 ? (
         <EmptyState title="Henüz ürün yok" description="İlk menü ürününüzü ekleyin." />
       ) : (
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>İsim</TableHead>
-                <TableHead className="hidden md:table-cell">Kategori</TableHead>
-                <TableHead>Fiyat</TableHead>
-                <TableHead>Durum</TableHead>
-                <TableHead className="w-24 text-right">İşlemler</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>
-                    <p className="font-medium">{product.name}</p>
-                    {product.description ? (
-                      <p className="text-muted-foreground line-clamp-1 text-sm">{product.description}</p>
-                    ) : null}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground hidden md:table-cell">
-                    {product.category?.name ?? "—"}
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    {formatPrice(product.price, currencyByRestaurant.get(product.restaurant_id))}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={product.is_available ? "default" : "secondary"}>
-                      {product.is_available ? "Mevcut" : "Tükendi"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-end">
-                      <ProductDialog categories={categories} product={product} />
-                      <DeleteDialog
-                        onConfirm={deleteProduct.bind(null, product.id)}
-                        iconOnly
-                        triggerLabel={`${product.name} ürününü sil`}
-                        title={`${product.name} silinsin mi?`}
-                        description="Bu işlem geri alınamaz."
-                      />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <SortableProductList groups={groups} categories={categories} />
       )}
     </>
   );

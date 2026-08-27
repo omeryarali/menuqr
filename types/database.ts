@@ -185,6 +185,8 @@ export interface Database {
     Functions: {
       is_restaurant_owner: { Args: { p_restaurant_id: string }; Returns: boolean };
       is_restaurant_published: { Args: { p_restaurant_id: string }; Returns: boolean };
+      reorder_categories: { Args: { p_ids: string[] }; Returns: undefined };
+      reorder_products: { Args: { p_ids: string[] }; Returns: undefined };
       menu_event_daily_counts: {
         Args: { p_days?: number; p_restaurant_id?: string | null };
         Returns: { day: string; event_type: string; event_count: number }[];

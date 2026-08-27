@@ -101,3 +101,22 @@ export async function deleteCategory(id: string): Promise<ActionState> {
   revalidatePath("/menu", "layout");
   return { status: "success", message: "Kategori silindi." };
 }
+
+/**
+ * Persists a drag-and-drop reorder.
+ *
+ * The RPC rewrites every position in one statement, and RLS inside it means an
+ * id we don't own simply matches nothing — no ownership pre-check needed here.
+ */
+export async function reorderCategories(ids: string[]): Promise<ActionState> {
+  await requireUser();
+  if (ids.length === 0) return { status: "success" };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("reorder_categories", { p_ids: ids });
+  if (error) return errorState(error.message);
+
+  revalidatePath("/dashboard/categories");
+  revalidatePath("/menu", "layout");
+  return { status: "success", message: "Sıralama kaydedildi." };
+}

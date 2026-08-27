@@ -5,13 +5,10 @@ import { Suspense } from "react";
 import { CategoryDialog } from "@/components/dashboard/category-dialog";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { RestaurantSwitcher } from "@/components/dashboard/restaurant-switcher";
-import { DeleteDialog } from "@/components/shared/delete-dialog";
+import { SortableCategoryList } from "@/components/dashboard/sortable-category-list";
 import { EmptyState } from "@/components/shared/empty-state";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { deleteCategory } from "@/lib/actions/categories";
 import { listCategories } from "@/services/categories";
 import { listRestaurants } from "@/services/restaurants";
 
@@ -27,7 +24,6 @@ export default async function CategoriesPage({ searchParams }: Props) {
     listCategories(restaurantFilter),
   ]);
 
-  const restaurantNames = new Map(restaurants.map((r) => [r.id, r.name]));
   const nextPosition = categories.length;
 
   if (restaurants.length === 0) {
@@ -68,52 +64,7 @@ export default async function CategoriesPage({ searchParams }: Props) {
       {categories.length === 0 ? (
         <EmptyState title="Henüz kategori yok" description="Başlangıçlar, Ana Yemekler veya İçecekler gibi bir kategori ekleyin." />
       ) : (
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-16">#</TableHead>
-                <TableHead>İsim</TableHead>
-                <TableHead className="hidden md:table-cell">Restoran</TableHead>
-                <TableHead>Durum</TableHead>
-                <TableHead className="w-24 text-right">İşlemler</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {categories.map((category) => (
-                <TableRow key={category.id}>
-                  <TableCell className="text-muted-foreground">{category.position}</TableCell>
-                  <TableCell>
-                    <p className="font-medium">{category.name}</p>
-                    {category.description ? (
-                      <p className="text-muted-foreground line-clamp-1 text-sm">{category.description}</p>
-                    ) : null}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground hidden md:table-cell">
-                    {restaurantNames.get(category.restaurant_id) ?? "—"}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={category.is_active ? "default" : "secondary"}>
-                      {category.is_active ? "Görünür" : "Gizli"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-end">
-                      <CategoryDialog restaurants={restaurants} category={category} />
-                      <DeleteDialog
-                        onConfirm={deleteCategory.bind(null, category.id)}
-                        iconOnly
-                        triggerLabel={`${category.name} kategorisini sil`}
-                        title={`${category.name} silinsin mi?`}
-                        description="Bu kategorideki tüm ürünler de silinir. Bu işlem geri alınamaz."
-                      />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <SortableCategoryList categories={categories} restaurants={restaurants} />
       )}
     </>
   );

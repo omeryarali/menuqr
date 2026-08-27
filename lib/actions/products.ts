@@ -115,3 +115,41 @@ export async function deleteProduct(id: string): Promise<ActionState> {
   revalidatePath("/menu", "layout");
   return { status: "success", message: "Ürün silindi." };
 }
+
+/** Persists a drag-and-drop reorder. See reorderCategories for why this is safe. */
+export async function reorderProducts(ids: string[]): Promise<ActionState> {
+  await requireUser();
+  if (ids.length === 0) return { status: "success" };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("reorder_products", { p_ids: ids });
+  if (error) return errorState(error.message);
+
+  revalidatePath("/dashboard/products");
+  revalidatePath("/menu", "layout");
+  return { status: "success", message: "Sıralama kaydedildi." };
+}
+
+/**
+ * Flips a single product between available and sold out.
+ *
+ * Exists so a busy owner can mark something off mid-service without opening the
+ * edit dialog — the one change they make most often during a shift.
+ */
+export async function toggleProductAvailability(id: string, isAvailable: boolean): Promise<ActionState> {
+  await requireUser();
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("products")
+    .update({ is_available: isAvailable })
+    .eq("id", id)
+    .select("id");
+
+  if (error) return errorState(error.message);
+  if (!data?.length) return errorState("Ürün bulunamadı.");
+
+  revalidatePath("/dashboard/products");
+  revalidatePath("/menu", "layout");
+  return { status: "success", message: isAvailable ? "Ürün mevcut olarak işaretlendi." : "Ürün tükendi olarak işaretlendi." };
+}
