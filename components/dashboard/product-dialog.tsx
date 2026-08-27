@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
 
+import { ProductImageField } from "@/components/dashboard/product-image-field";
 import { FieldError } from "@/components/shared/field-error";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -38,6 +39,13 @@ export function ProductDialog({ categories, product, defaultCategoryId, nextPosi
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<ActionState>(idleState);
   const [formKey, setFormKey] = useState(0);
+
+  // Tracked (not just defaultValue) because the image upload folder is keyed by
+  // the owning restaurant, which is derived from whichever category is selected
+  // right now.
+  const initialCategoryId = product?.category_id ?? defaultCategoryId ?? categories[0]?.id;
+  const [categoryId, setCategoryId] = useState<string | undefined>(initialCategoryId);
+  const uploadRestaurantId = categories.find((c) => c.id === categoryId)?.restaurant_id;
 
   const fieldErrors = state.status === "error" ? state.fieldErrors : undefined;
 
@@ -94,7 +102,8 @@ export function ProductDialog({ categories, product, defaultCategoryId, nextPosi
                 not its UUID (Base UI SelectValue doesn't auto-resolve labels). */}
             <Select
               name="categoryId"
-              defaultValue={product?.category_id ?? defaultCategoryId ?? categories[0]?.id}
+              value={categoryId}
+              onValueChange={(value) => value && setCategoryId(value)}
               items={Object.fromEntries(categories.map((c) => [c.id, c.name]))}
               required
             >
@@ -158,17 +167,11 @@ export function ProductDialog({ categories, product, defaultCategoryId, nextPosi
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="imageUrl">Görsel adresi</Label>
-            <Input
-              id="imageUrl"
-              name="imageUrl"
-              type="url"
-              placeholder="https://…"
-              defaultValue={product?.image_url ?? ""}
-            />
-            <FieldError messages={fieldErrors?.imageUrl} />
-          </div>
+          <ProductImageField
+            defaultValue={product?.image_url}
+            restaurantId={uploadRestaurantId}
+            errors={fieldErrors?.imageUrl}
+          />
 
           <div className="flex items-center justify-between rounded-lg border p-3">
             <div className="space-y-0.5">

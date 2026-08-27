@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth";
+import { removeImagesForCategory } from "@/lib/storage-cleanup";
 import { createClient } from "@/lib/supabase/server";
 import { categorySchema } from "@/lib/validators/category";
 
@@ -88,7 +89,10 @@ export async function deleteCategory(id: string): Promise<ActionState> {
   await requireUser();
   const supabase = await createClient();
 
-  // Products cascade. The confirm dialog warns about this.
+  // Products cascade in Postgres, but the storage bucket doesn't know about
+  // that — sweep their photos first, while the rows still name them.
+  await removeImagesForCategory(supabase, id);
+
   const { error } = await supabase.from("categories").delete().eq("id", id);
   if (error) return errorState(error.message);
 

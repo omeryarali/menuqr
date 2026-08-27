@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { MenuGalleryProvider, type GalleryItem } from "@/components/menu/menu-gallery";
 import { MenuHeader } from "@/components/menu/menu-header";
 import { MenuSection } from "@/components/menu/menu-section";
 import { MenuTracker } from "@/components/menu/menu-tracker";
@@ -45,6 +46,19 @@ export default async function PublicMenuPage({ params }: Props) {
 
   const theme = resolveTheme(menu.theme);
 
+  // Flattened in display order, so the modal's prev/next walks the menu the way
+  // the customer reads it rather than in database order.
+  const galleryItems: GalleryItem[] = menu.categories.flatMap((category) =>
+    category.products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      imageUrl: product.image_url,
+      isAvailable: product.is_available,
+    })),
+  );
+
   return (
     <div
       data-menu-theme={theme}
@@ -65,41 +79,43 @@ export default async function PublicMenuPage({ params }: Props) {
           and unpublished menus. Renders nothing. */}
       <MenuTracker slug={menu.slug} />
 
-      <div className="relative mx-auto flex min-h-svh w-full max-w-2xl flex-col gap-10 px-5 py-10 sm:px-6">
-        {!menu.is_published ? (
-          <p
-            className="rounded-full border px-4 py-2 text-center text-xs"
-            style={{ borderColor: "var(--menu-border)", color: "var(--menu-muted)" }}
+      <MenuGalleryProvider items={galleryItems} currency={menu.currency}>
+        <div className="relative mx-auto flex min-h-svh w-full max-w-2xl flex-col gap-10 px-5 py-10 sm:px-6">
+          {!menu.is_published ? (
+            <p
+              className="rounded-full border px-4 py-2 text-center text-xs"
+              style={{ borderColor: "var(--menu-border)", color: "var(--menu-muted)" }}
+            >
+              Taslak önizleme — bunu yalnızca siz görüyorsunuz. Herkese açmak için restoranı yayınlayın.
+            </p>
+          ) : null}
+
+          <MenuHeader restaurant={menu} />
+
+          {menu.categories.length === 0 ? (
+            <p className="py-12 text-center text-sm" style={{ color: "var(--menu-muted)" }}>
+              Bu menü güncelleniyor. Lütfen kısa süre sonra tekrar bakın.
+            </p>
+          ) : (
+            <main className="flex flex-col gap-12">
+              {menu.categories.map((category) => (
+                <MenuSection key={category.id} category={category} currency={menu.currency} />
+              ))}
+            </main>
+          )}
+
+          <footer
+            className="mt-auto flex items-center justify-center gap-1.5 pt-6 text-center text-xs"
+            style={{ color: "var(--menu-muted)" }}
           >
-            Taslak önizleme — bunu yalnızca siz görüyorsunuz. Herkese açmak için restoranı yayınlayın.
-          </p>
-        ) : null}
-
-        <MenuHeader restaurant={menu} />
-
-        {menu.categories.length === 0 ? (
-          <p className="py-12 text-center text-sm" style={{ color: "var(--menu-muted)" }}>
-            Bu menü güncelleniyor. Lütfen kısa süre sonra tekrar bakın.
-          </p>
-        ) : (
-          <main className="flex flex-col gap-12">
-            {menu.categories.map((category) => (
-              <MenuSection key={category.id} category={category} currency={menu.currency} />
-            ))}
-          </main>
-        )}
-
-        <footer
-          className="mt-auto flex items-center justify-center gap-1.5 pt-6 text-center text-xs"
-          style={{ color: "var(--menu-muted)" }}
-        >
-          <span
-            className="inline-block size-1.5 rounded-full"
-            style={{ backgroundColor: "var(--menu-accent)" }}
-          />
-          MenuQR ile hazırlandı
-        </footer>
-      </div>
+            <span
+              className="inline-block size-1.5 rounded-full"
+              style={{ backgroundColor: "var(--menu-accent)" }}
+            />
+            MenuQR ile hazırlandı
+          </footer>
+        </div>
+      </MenuGalleryProvider>
     </div>
   );
 }

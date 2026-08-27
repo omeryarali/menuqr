@@ -113,8 +113,31 @@ SELECT only their own. There is no UPDATE/DELETE policy, so events are immutable
 - `menu_event_daily_counts` is SECURITY **INVOKER** so the caller's RLS still applies. Never convert
   it to DEFINER — that would expose every tenant's traffic.
 
+## Product images
+
+Two sources, and the difference matters at every layer:
+
+- **Uploaded** to the `product-images` bucket (migration `0006`), path
+  `{restaurant_id}/{uuid}.{ext}`. The first path segment is the tenant key — storage policies read it
+  back with `storage.foldername()` and run it through `is_restaurant_owner`. Not keyed by product id
+  because the upload happens before the product row exists.
+- **Pasted** third-party URLs, which still work and are stored in the same `products.image_url`.
+
+`isUploadedImage()` is what separates them, and both callers depend on it: the menu renders uploads
+through `next/image` (host allowlisted in `next.config.ts`) and pasted URLs through a plain `<img>`,
+because the optimizer rejects non-allowlisted hosts. Cleanup uses `storagePathFromUrl()`, which
+returns null for foreign URLs — that is the guard that stops us deleting something we never
+uploaded. A lookalike host (`evil.com/storage/v1/object/public/…`) fails both checks.
+
+Postgres cascades products when a category or restaurant is deleted, but the bucket knows nothing
+about that cascade, so `lib/storage-cleanup.ts` sweeps the files first. All of it is best effort —
+never let cleanup turn a successful delete into a visible failure.
+
+Uploads go browser → Storage directly, not through a server action (a 5 MB file would otherwise be
+base64'd into the action payload). Storage RLS is what authorizes the write.
+
 ## Out of scope
 
-Theme builder, subscriptions, multi-user roles, image upload (products take a URL). The `qr_codes`
-table is provisioned but unwritten — codes derive from the slug via `/api/qr/{slug}`. Don't build on
-`qr_codes.scan_count`; it is always 0 and analytics live in `menu_events` instead.
+Theme builder, subscriptions, multi-user roles. The `qr_codes` table is provisioned but unwritten —
+codes derive from the slug via `/api/qr/{slug}`. Don't build on `qr_codes.scan_count`; it is always 0
+and analytics live in `menu_events` instead.

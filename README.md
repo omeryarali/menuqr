@@ -94,10 +94,21 @@ A QR scan is only distinguishable from a normal visit because the QR image encod
 printed before this shipped still work — their scans just count as plain views. Reprint from
 **Karekodlar** to get scan attribution.
 
+## Product photos
+
+Upload a file (stored in the `product-images` bucket, owner-scoped by RLS) or paste any image URL —
+both work. Uploads are served through `next/image` for resizing and WebP/AVIF; pasted URLs render as
+plain images since the optimizer only accepts allowlisted hosts.
+
+On the public menu, tapping a photo or a description opens a detail modal with the full text, and
+arrow keys / prev-next walk the whole menu.
+
+Deleting a product, category or restaurant also removes the uploaded files — best effort, so a
+storage hiccup never blocks the delete.
+
 ## What's not here
 
-Deliberately out of scope: theme builder, subscriptions/billing, multi-user roles per restaurant, and
-image upload/optimization (products take an image **URL**).
+Deliberately out of scope: theme builder, subscriptions/billing, and multi-user roles per restaurant.
 
 The `qr_codes` table exists but is unwritten — codes are derived from the slug. See the comment in
 `0001_init.sql`.

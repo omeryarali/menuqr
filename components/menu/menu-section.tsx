@@ -1,4 +1,5 @@
 import { MenuImage } from "@/components/menu/menu-image";
+import { ProductDescription } from "@/components/menu/product-description";
 import { formatPrice } from "@/lib/utils/format";
 import type { CategoryWithProducts } from "@/types/database";
 
@@ -32,7 +33,9 @@ export function MenuSection({ category, currency }: { category: CategoryWithProd
             className="flex gap-4"
             style={{ opacity: product.is_available ? 1 : 0.5 }}
           >
-            {product.image_url ? <MenuImage src={product.image_url} alt={product.name} /> : null}
+            {product.image_url ? (
+              <MenuImage src={product.image_url} alt={product.name} productId={product.id} />
+            ) : null}
 
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline gap-2">
@@ -61,12 +64,7 @@ export function MenuSection({ category, currency }: { category: CategoryWithProd
               </div>
 
               {product.description ? (
-                <p
-                  className="mt-1 max-w-prose text-sm leading-relaxed text-pretty"
-                  style={{ color: "var(--menu-muted)" }}
-                >
-                  {product.description}
-                </p>
+                <ProductDescription productId={product.id} text={product.description} />
               ) : null}
             </div>
           </li>

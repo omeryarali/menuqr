@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth";
+import { removeProductImage } from "@/lib/storage-cleanup";
 import { createClient } from "@/lib/supabase/server";
 import { productSchema } from "@/lib/validators/product";
 
@@ -64,6 +65,11 @@ export async function updateProduct(id: string, _prev: ActionState, formData: Fo
 
   const input = parsed.data;
   const supabase = await createClient();
+  const nextImage = nullify(input.imageUrl);
+
+  // Read the old photo before overwriting the row — afterwards there is no
+  // record of what to clean up. RLS scopes this select to our own product.
+  const { data: existing } = await supabase.from("products").select("image_url").eq("id", id).maybeSingle();
 
   const { data, error } = await supabase
     .from("products")
@@ -72,7 +78,7 @@ export async function updateProduct(id: string, _prev: ActionState, formData: Fo
       name: input.name,
       description: nullify(input.description),
       price: input.price,
-      image_url: nullify(input.imageUrl),
+      image_url: nextImage,
       is_available: input.isAvailable,
       position: input.position,
     })
@@ -81,6 +87,11 @@ export async function updateProduct(id: string, _prev: ActionState, formData: Fo
 
   if (error) return errorState(error.message);
   if (!data?.length) return errorState("Ürün bulunamadı.");
+
+  // Only after the write succeeded, and only if the photo actually changed.
+  if (existing?.image_url && existing.image_url !== nextImage) {
+    await removeProductImage(supabase, existing.image_url);
+  }
 
   revalidatePath("/dashboard/products");
   revalidatePath("/menu", "layout");
@@ -91,8 +102,14 @@ export async function deleteProduct(id: string): Promise<ActionState> {
   await requireUser();
   const supabase = await createClient();
 
+  // Grab the photo path first: once the row is gone the URL is unrecoverable
+  // and the file would sit in the bucket forever.
+  const { data: existing } = await supabase.from("products").select("image_url").eq("id", id).maybeSingle();
+
   const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) return errorState(error.message);
+
+  await removeProductImage(supabase, existing?.image_url);
 
   revalidatePath("/dashboard/products");
   revalidatePath("/menu", "layout");

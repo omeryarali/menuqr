@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth";
+import { removeImagesForRestaurant } from "@/lib/storage-cleanup";
 import { createClient } from "@/lib/supabase/server";
 import { restaurantSchema } from "@/lib/validators/restaurant";
 
@@ -120,7 +121,10 @@ export async function deleteRestaurant(id: string): Promise<void> {
   await requireUser();
   const supabase = await createClient();
 
-  // Categories, products and QR codes cascade via FK ON DELETE CASCADE.
+  // Categories, products and QR codes cascade via FK ON DELETE CASCADE — the
+  // storage bucket does not, so empty this restaurant's folder first.
+  await removeImagesForRestaurant(supabase, id);
+
   const { error } = await supabase.from("restaurants").delete().eq("id", id);
   if (error) throw new Error(`Failed to delete restaurant: ${error.message}`);
 
