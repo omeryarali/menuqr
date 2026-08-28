@@ -23,6 +23,7 @@ function parse(formData: FormData) {
     currency: formData.get("currency"),
     isPublished: formData.get("isPublished") === "on",
     theme: formData.get("theme") ?? "classic",
+    openingHours: formData.get("openingHours") ?? undefined,
   });
 }
 
@@ -52,6 +53,7 @@ export async function createRestaurant(_prev: ActionState, formData: FormData): 
       currency: input.currency,
       is_published: input.isPublished,
       theme: input.theme,
+      opening_hours: input.openingHours,
     })
     .select("id")
     .single();
@@ -94,6 +96,7 @@ export async function updateRestaurant(
       currency: input.currency,
       is_published: input.isPublished,
       theme: input.theme,
+      opening_hours: input.openingHours,
     })
     .eq("id", id)
     .select("id");

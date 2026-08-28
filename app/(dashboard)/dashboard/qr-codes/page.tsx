@@ -46,6 +46,7 @@ export default async function QrCodesPage() {
           {cards.map((card) => (
             <QrCard
               key={card.id}
+              id={card.id}
               name={card.name}
               slug={card.slug}
               menuUrl={card.menuUrl}

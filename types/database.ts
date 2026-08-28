@@ -47,6 +47,8 @@ export interface Database {
           currency: string;
           is_published: boolean;
           theme: string;
+          /** OpeningHours shape; validate with parseOpeningHours() before use. */
+          opening_hours: Json | null;
           created_at: string;
           updated_at: string;
         };
@@ -61,6 +63,7 @@ export interface Database {
           currency?: string;
           is_published?: boolean;
           theme?: string;
+          opening_hours?: Json | null;
         };
         Update: {
           name?: string;
@@ -71,6 +74,7 @@ export interface Database {
           currency?: string;
           is_published?: boolean;
           theme?: string;
+          opening_hours?: Json | null;
         };
         Relationships: [];
       };

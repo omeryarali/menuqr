@@ -3,7 +3,9 @@
 import Image from "next/image";
 import { useState } from "react";
 
-import { Check, Copy, Download } from "lucide-react";
+import Link from "next/link";
+
+import { Check, Copy, Download, Printer } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -14,12 +16,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const SIZES = [256, 512, 1024, 2048] as const;
 
 export function QrCard({
+  id,
   name,
   slug,
   menuUrl,
   previewDataUrl,
   isPublished,
 }: {
+  id: string;
   name: string;
   slug: string;
   menuUrl: string;
@@ -98,6 +102,11 @@ export function QrCard({
             {copied ? <Check className="size-4" aria-hidden /> : <Copy className="size-4" aria-hidden />}
           </Button>
         </div>
+
+        <Button variant="secondary" className="w-full" render={<Link href={`/qr-print/${id}`} />}>
+          <Printer className="size-4" aria-hidden />
+          Yazdırılabilir kart
+        </Button>
 
         <div className="grid grid-cols-2 gap-2">
           {/* Plain links, not fetch+blob: the browser handles the download and

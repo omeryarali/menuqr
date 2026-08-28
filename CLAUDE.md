@@ -151,6 +151,23 @@ The sortable lists hold their own copy of the rows for the optimistic move and r
 **during render**, not in an effect (`react-hooks/set-state-in-effect` would fail, and an effect
 would flash the stale order).
 
+## Opening hours, SEO and print
+
+`restaurants.opening_hours` is JSONB (migration `0009`): `{"mon": {"open","close"}, ...}`, a missing
+day meaning closed. Always run it through `parseOpeningHours()` — it narrows the untrusted column and
+degrades a malformed week to "no hours" rather than throwing on a customer's menu.
+
+- Times are wall-clock **Europe/Istanbul**, matching the analytics rollup. There is no per-tenant
+  timezone; add one before assuming otherwise.
+- `isOpenNow()` consults *yesterday* as well as today, because a shift like `18:00–02:00` means
+  Saturday 01:00 still belongs to Friday. Don't "simplify" that branch away.
+- The badge is computed server-side, which is only safe because `/menu/[slug]` is `force-dynamic`.
+- `components/menu/menu-json-ld.tsx` emits schema.org Restaurant + Menu, and skips unpublished
+  restaurants entirely (they are noindex anyway). The payload is JSON.stringify'd with `<` escaped,
+  so a product name can't break out of the script tag.
+- `/qr-print/[id]` lives **outside** the `(dashboard)` group so the sidebar never reaches the paper —
+  which makes auth its own responsibility (`requireUser` + owner-scoped `getRestaurant`).
+
 ## Out of scope
 
 Theme builder, subscriptions, multi-user roles. The `qr_codes` table is provisioned but unwritten —

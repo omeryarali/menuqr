@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { FieldError } from "@/components/shared/field-error";
 import { SubmitButton } from "@/components/shared/submit-button";
+import { OpeningHoursField } from "@/components/dashboard/opening-hours-field";
 import { ThemePicker } from "@/components/dashboard/theme-picker";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { idleState, type ActionState } from "@/lib/actions/types";
+import { parseOpeningHours } from "@/lib/opening-hours";
 import { slugify } from "@/lib/utils/slug";
 import type { Restaurant } from "@/types/database";
 
@@ -110,6 +112,8 @@ export function RestaurantForm({ action, restaurant }: Props) {
         <Input id="phone" name="phone" type="tel" defaultValue={restaurant?.phone ?? ""} />
         <FieldError messages={fieldErrors?.phone} />
       </div>
+
+      <OpeningHoursField value={parseOpeningHours(restaurant?.opening_hours)} />
 
       <ThemePicker value={restaurant?.theme} />
 

@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 
 import { MenuGalleryProvider, type GalleryItem } from "@/components/menu/menu-gallery";
 import { MenuHeader } from "@/components/menu/menu-header";
+import { MenuJsonLd } from "@/components/menu/menu-json-ld";
 import { MenuSection } from "@/components/menu/menu-section";
 import { MenuTracker } from "@/components/menu/menu-tracker";
+import { env } from "@/lib/env";
 import { resolveTheme } from "@/lib/themes";
 import { getPublicMenu } from "@/services/menu";
 
@@ -28,7 +30,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${menu.name} · Menü`,
     description: menu.description ?? `${menu.name} menüsünü inceleyin.`,
+    alternates: { canonical: `${env.NEXT_PUBLIC_SITE_URL}/menu/${menu.slug}` },
     openGraph: {
+      url: `${env.NEXT_PUBLIC_SITE_URL}/menu/${menu.slug}`,
       title: `${menu.name} · Menü`,
       description: menu.description ?? undefined,
       type: "website",
@@ -78,6 +82,7 @@ export default async function PublicMenuPage({ params }: Props) {
       {/* Records the visit client-side; the API skips the owner's own previews
           and unpublished menus. Renders nothing. */}
       <MenuTracker slug={menu.slug} />
+      <MenuJsonLd menu={menu} />
 
       <MenuGalleryProvider items={galleryItems} currency={menu.currency}>
         <div className="relative mx-auto flex min-h-svh w-full max-w-2xl flex-col gap-10 px-5 py-10 sm:px-6">

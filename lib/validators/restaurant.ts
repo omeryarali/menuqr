@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { parseOpeningHours } from "@/lib/opening-hours";
+
 /** 0001_init.sql içindeki slug CHECK kısıtının birebir karşılığı. */
 export const slugSchema = z
   .string()
@@ -19,6 +21,20 @@ export const restaurantSchema = z.object({
   // Mirrors the CHECK in 0003_theme.sql. Unknown values fall back rather than
   // erroring, so a stale form can't block a save.
   theme: z.enum(["classic", "modern", "warm", "dark-lux"]).catch("classic"),
+  // Arrives as a JSON string from OpeningHoursField. parseOpeningHours drops
+  // malformed days rather than failing the whole save — a bad hour must not
+  // block someone renaming their restaurant.
+  openingHours: z
+    .string()
+    .optional()
+    .transform((raw) => {
+      if (!raw) return null;
+      try {
+        return parseOpeningHours(JSON.parse(raw));
+      } catch {
+        return null;
+      }
+    }),
 });
 
 export type RestaurantInput = z.infer<typeof restaurantSchema>;

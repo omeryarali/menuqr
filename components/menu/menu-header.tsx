@@ -1,5 +1,8 @@
 import { MapPin, Phone } from "lucide-react";
 
+import { MenuHours } from "@/components/menu/menu-hours";
+import { parseOpeningHours } from "@/lib/opening-hours";
+
 import type { Restaurant } from "@/types/database";
 
 export function MenuHeader({ restaurant }: { restaurant: Restaurant }) {
@@ -48,6 +51,8 @@ export function MenuHeader({ restaurant }: { restaurant: Restaurant }) {
           ) : null}
         </div>
       ) : null}
+
+      <MenuHours hours={parseOpeningHours(restaurant.opening_hours)} />
     </header>
   );
 }
