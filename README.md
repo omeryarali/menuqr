@@ -16,10 +16,24 @@ The UI is Turkish and hardcoded (no i18n layer). Code and comments are English. 
 
 ### 2. Run the migrations
 
-In the Supabase dashboard, open **SQL Editor** and run these in order, once, on a fresh project:
+In the Supabase dashboard, open **SQL Editor** and run every file in `supabase/migrations/` in
+numeric order, once, on a fresh project:
 
-1. `supabase/migrations/0001_init.sql` — tables, triggers, indexes
-2. `supabase/migrations/0002_rls.sql` — row level security policies
+| File | What it does |
+| ---- | ------------ |
+| `0001_init.sql` | tables, triggers, indexes |
+| `0002_rls.sql` | row level security policies |
+| `0003_theme.sql` | per-restaurant menu theme |
+| `0004_dark_lux_theme.sql` | widens the theme CHECK |
+| `0005_analytics.sql` | menu view / QR scan events + rollup |
+| `0006_product_images.sql` | storage bucket and its policies |
+| `0007_product_images_select.sql` | the SELECT policy cleanup needs |
+| `0008_reorder.sql` | bulk position updates for drag-and-drop |
+| `0009_opening_hours.sql` | opening hours column |
+| `0010_drop_qr_codes.sql` | removes the unused qr_codes table |
+
+They are a history, not a description of the current schema — `0010` drops something `0001`
+creates, which is expected.
 
 ### 3. Configure environment
 
@@ -110,5 +124,4 @@ storage hiccup never blocks the delete.
 
 Deliberately out of scope: theme builder, subscriptions/billing, and multi-user roles per restaurant.
 
-The `qr_codes` table exists but is unwritten — codes are derived from the slug. See the comment in
-`0001_init.sql`.
+QR images are generated from the restaurant slug, so there is no row per code.

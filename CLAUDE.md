@@ -170,6 +170,8 @@ degrades a malformed week to "no hours" rather than throwing on a customer's men
 
 ## Out of scope
 
-Theme builder, subscriptions, multi-user roles. The `qr_codes` table is provisioned but unwritten —
-codes derive from the slug via `/api/qr/{slug}`. Don't build on `qr_codes.scan_count`; it is always 0
-and analytics live in `menu_events` instead.
+Theme builder, subscriptions, multi-user roles, per-table QR codes.
+
+QR images are derived from the restaurant slug (`/api/qr/{slug}`) — there is no row per code. A
+`qr_codes` table existed for that from `0001` until `0010` dropped it unused; if per-table codes ever
+ship, design the table then rather than reviving that one. Menu traffic lives in `menu_events`.

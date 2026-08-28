@@ -146,28 +146,6 @@ export interface Database {
         };
         Relationships: [];
       };
-      qr_codes: {
-        Row: {
-          id: string;
-          restaurant_id: string;
-          label: string;
-          target_url: string;
-          scan_count: number;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          restaurant_id: string;
-          label?: string;
-          target_url: string;
-        };
-        Update: {
-          label?: string;
-          target_url?: string;
-        };
-        Relationships: [];
-      };
       menu_events: {
         Row: {
           id: string;
@@ -205,7 +183,6 @@ export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Restaurant = Database["public"]["Tables"]["restaurants"]["Row"];
 export type Category = Database["public"]["Tables"]["categories"]["Row"];
 export type Product = Database["public"]["Tables"]["products"]["Row"];
-export type QrCode = Database["public"]["Tables"]["qr_codes"]["Row"];
 export type MenuEvent = Database["public"]["Tables"]["menu_events"]["Row"];
 
 /** The two things we count on the public menu. */
