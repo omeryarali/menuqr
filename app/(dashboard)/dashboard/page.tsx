@@ -4,11 +4,12 @@ import Link from "next/link";
 import { FolderTree, Plus, Store, UtensilsCrossed } from "lucide-react";
 
 import { PageHeader } from "@/components/dashboard/page-header";
+import { ReadinessCard } from "@/components/dashboard/readiness-card";
 import { EmptyState } from "@/components/shared/empty-state";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getProfile } from "@/lib/auth";
+import { getRestaurantReadiness } from "@/lib/readiness";
 import { listCategories } from "@/services/categories";
 import { listProducts } from "@/services/products";
 import { listRestaurants } from "@/services/restaurants";
@@ -81,27 +82,11 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               {restaurants.map((restaurant) => (
-                <div
+                <ReadinessCard
                   key={restaurant.id}
-                  className="flex items-center justify-between gap-4 rounded-md border p-3"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">{restaurant.name}</p>
-                    <p className="text-muted-foreground truncate text-sm">/menu/{restaurant.slug}</p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <Badge variant={restaurant.is_published ? "default" : "secondary"}>
-                      {restaurant.is_published ? "Yayında" : "Taslak"}
-                    </Badge>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      render={<Link href={`/dashboard/restaurants/${restaurant.id}`} />}
-                    >
-                      Yönet
-                    </Button>
-                  </div>
-                </div>
+                  restaurant={restaurant}
+                  readiness={getRestaurantReadiness(restaurant, categories, products)}
+                />
               ))}
             </CardContent>
           </Card>
