@@ -1,3 +1,5 @@
+import { Star } from "lucide-react";
+
 import { MenuImage } from "@/components/menu/menu-image";
 import { ProductDescription } from "@/components/menu/product-description";
 import { ProductName } from "@/components/menu/product-name";
@@ -41,6 +43,16 @@ export function MenuSection({ category, currency }: { category: CategoryWithProd
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline gap-2">
                 <ProductName productId={product.id} name={product.name} />
+                {product.is_featured ? (
+                  <span
+                    className="inline-flex shrink-0 items-center gap-1 text-[0.7rem] whitespace-nowrap"
+                    style={{ color: "var(--menu-accent)" }}
+                    title="Şefin önerisi"
+                  >
+                    <Star className="size-3 fill-current" aria-hidden />
+                    Şefin önerisi
+                  </span>
+                ) : null}
                 {!product.is_available ? (
                   <span className="text-[0.7rem] whitespace-nowrap" style={{ color: "var(--menu-muted)" }}>
                     Tükendi

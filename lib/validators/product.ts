@@ -14,6 +14,7 @@ export const productSchema = z.object({
     }),
   imageUrl: z.string().trim().url("Geçerli bir görsel adresi girin").optional().or(z.literal("")),
   isAvailable: z.boolean(),
+  isFeatured: z.boolean(),
   position: z.coerce.number().int("Sıra tam sayı olmalı").min(0).max(9999).default(0),
 });
 

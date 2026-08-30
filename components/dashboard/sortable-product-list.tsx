@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 
 import { AvailabilityToggle } from "@/components/dashboard/availability-toggle";
+import { FeaturedToggle } from "@/components/dashboard/featured-toggle";
 import { ProductDialog } from "@/components/dashboard/product-dialog";
 import { SortableRow } from "@/components/dashboard/sortable-row";
 import { DeleteDialog } from "@/components/shared/delete-dialog";
@@ -146,6 +147,11 @@ function ProductGroupTable({ group, categories }: { group: ProductGroup; categor
                     </TableCell>
                     <TableCell>
                       <div className="flex justify-end">
+                        <FeaturedToggle
+                          productId={product.id}
+                          productName={product.name}
+                          isFeatured={product.is_featured}
+                        />
                         <ProductDialog categories={categories} product={product} />
                         <DeleteDialog
                           onConfirm={deleteProduct.bind(null, product.id)}

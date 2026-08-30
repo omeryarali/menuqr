@@ -74,6 +74,9 @@ export default async function MenuPrintPage({ params }: Props) {
           <li key={product.id} className="break-inside-avoid text-sm">
             <div className="flex items-baseline gap-2">
               <span className="font-medium">{product.name}</span>
+              {product.is_featured ? (
+                <span className="shrink-0 text-[0.65rem] whitespace-nowrap">★ Şefin önerisi</span>
+              ) : null}
               <span className="relative -top-1 min-w-4 flex-1 border-b border-dotted" aria-hidden />
               <span className="shrink-0 tabular-nums">{formatPrice(product.price, menu.currency)}</span>
             </div>

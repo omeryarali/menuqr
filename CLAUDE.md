@@ -136,6 +136,15 @@ never let cleanup turn a successful delete into a visible failure.
 Uploads go browser → Storage directly, not through a server action (a 5 MB file would otherwise be
 base64'd into the action payload). Storage RLS is what authorizes the write.
 
+## Featured products
+
+`products.is_featured` (migration `0012`) marks a dish as the chef's recommendation. It changes only
+how the item is *marked* — never where it appears. Ordering belongs to the owner's drag-and-drop, and
+auto-pinning featured items to the top would silently fight it.
+
+The mark has to be added in all three surfaces or they disagree: the public menu, the detail modal
+(`GalleryItem.isFeatured`) and the paper menu.
+
 ## Dashboard ordering
 
 `position` orders rows *within* a parent — categories within a restaurant, products within a

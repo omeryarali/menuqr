@@ -115,6 +115,7 @@ export interface Database {
           price: number;
           image_url: string | null;
           is_available: boolean;
+          is_featured: boolean;
           position: number;
           created_at: string;
           updated_at: string;
@@ -133,6 +134,7 @@ export interface Database {
           price?: number;
           image_url?: string | null;
           is_available?: boolean;
+          is_featured?: boolean;
           position?: number;
         };
         Update: {
@@ -142,6 +144,7 @@ export interface Database {
           price?: number;
           image_url?: string | null;
           is_available?: boolean;
+          is_featured?: boolean;
           position?: number;
         };
         Relationships: [];

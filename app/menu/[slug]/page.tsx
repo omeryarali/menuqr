@@ -60,6 +60,7 @@ export default async function PublicMenuPage({ params }: Props) {
       price: product.price,
       imageUrl: product.image_url,
       isAvailable: product.is_available,
+      isFeatured: product.is_featured,
     })),
   );
 

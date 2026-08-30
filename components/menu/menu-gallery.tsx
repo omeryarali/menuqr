@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star, X } from "lucide-react";
 
 import { formatPrice } from "@/lib/utils/format";
 
@@ -13,6 +13,7 @@ export type GalleryItem = {
   price: number;
   imageUrl: string | null;
   isAvailable: boolean;
+  isFeatured: boolean;
 };
 
 type GalleryContextValue = {
@@ -177,6 +178,16 @@ export function MenuGalleryProvider({
                   {formatPrice(item.price, currency)}
                 </span>
               </div>
+
+              {item.isFeatured ? (
+                <p
+                  className="inline-flex items-center gap-1 text-xs"
+                  style={{ color: "var(--menu-accent)" }}
+                >
+                  <Star className="size-3 fill-current" aria-hidden />
+                  Şefin önerisi
+                </p>
+              ) : null}
 
               {!item.isAvailable ? (
                 <p className="text-xs" style={{ color: "var(--menu-muted)" }}>

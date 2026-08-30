@@ -181,6 +181,16 @@ export function ProductDialog({ categories, product, defaultCategoryId, nextPosi
             <Switch id="isAvailable" name="isAvailable" defaultChecked={product?.is_available ?? true} />
           </div>
 
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div className="space-y-0.5">
+              <Label htmlFor="isFeatured">Öne çıkar</Label>
+              <p className="text-muted-foreground text-xs">
+                Menüde &ldquo;şefin önerisi&rdquo; olarak işaretlenir. Sıralamayı değiştirmez.
+              </p>
+            </div>
+            <Switch id="isFeatured" name="isFeatured" defaultChecked={product?.is_featured ?? false} />
+          </div>
+
           <SubmitButton className="w-full">{isEdit ? "Değişiklikleri kaydet" : "Ürünü oluştur"}</SubmitButton>
         </form>
       </DialogContent>

@@ -21,6 +21,7 @@ function parse(formData: FormData) {
     price: formData.get("price"),
     imageUrl: formData.get("imageUrl") ?? "",
     isAvailable: formData.get("isAvailable") === "on",
+    isFeatured: formData.get("isFeatured") === "on",
     position: formData.get("position") ?? 0,
   });
 }
@@ -47,6 +48,7 @@ export async function createProduct(_prev: ActionState, formData: FormData): Pro
     price: input.price,
     image_url: nullify(input.imageUrl),
     is_available: input.isAvailable,
+    is_featured: input.isFeatured,
     position: input.position,
   });
 
@@ -82,6 +84,7 @@ export async function updateProduct(id: string, _prev: ActionState, formData: Fo
       price: input.price,
       image_url: nextImage,
       is_available: input.isAvailable,
+      is_featured: input.isFeatured,
       position: input.position,
     })
     .eq("id", id)
@@ -201,4 +204,32 @@ export async function bulkUpdatePrices(productIds: string[], change: PriceChange
   revalidatePath("/dashboard/products");
   revalidatePath("/menu", "layout");
   return { status: "success", message: `${updates.length} ürünün fiyatı güncellendi.` };
+}
+
+/**
+ * Flips the chef's-recommendation mark on one product.
+ *
+ * Separate from toggleProductAvailability rather than a generic field toggle:
+ * a function that takes a column name is one typo away from writing to the
+ * wrong column, and these are the only two fields worth a one-tap control.
+ */
+export async function toggleProductFeatured(id: string, isFeatured: boolean): Promise<ActionState> {
+  await requireUser();
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("products")
+    .update({ is_featured: isFeatured })
+    .eq("id", id)
+    .select("id");
+
+  if (error) return errorState(error.message);
+  if (!data?.length) return errorState("Ürün bulunamadı.");
+
+  revalidatePath("/dashboard/products");
+  revalidatePath("/menu", "layout");
+  return {
+    status: "success",
+    message: isFeatured ? "Ürün öne çıkarıldı." : "Öne çıkarma kaldırıldı.",
+  };
 }
