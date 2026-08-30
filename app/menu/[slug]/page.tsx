@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { LanguageSwitcher } from "@/components/menu/language-switcher";
 import { MenuGalleryProvider, type GalleryItem } from "@/components/menu/menu-gallery";
 import { MenuHeader } from "@/components/menu/menu-header";
 import { MenuJsonLd } from "@/components/menu/menu-json-ld";
 import { MenuSection } from "@/components/menu/menu-section";
 import { MenuTracker } from "@/components/menu/menu-tracker";
 import { env } from "@/lib/env";
+import { BASE_LOCALE, localize, menuStrings, metaDescription, resolveLocale } from "@/lib/i18n";
 import { resolveTheme } from "@/lib/themes";
 import { getPublicMenu } from "@/services/menu";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ lang?: string }>;
+};
 
 /**
  * Rendered dynamically rather than statically cached.
@@ -21,47 +26,64 @@ type Props = { params: Promise<{ slug: string }> };
  */
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  const [{ slug }, { lang }] = await Promise.all([params, searchParams]);
   const menu = await getPublicMenu(slug);
+  const locale = resolveLocale(lang);
+  const s = menuStrings(locale);
 
-  if (!menu) return { title: "Menü bulunamadı" };
+  if (!menu) return { title: locale === BASE_LOCALE ? "Menü bulunamadı" : "Menu not found" };
+
+  const base = `${env.NEXT_PUBLIC_SITE_URL}/menu/${menu.slug}`;
+  const canonical = locale === BASE_LOCALE ? base : `${base}?lang=${locale}`;
+  const title = `${menu.name} · ${s.menuSuffix}`;
 
   return {
-    title: `${menu.name} · Menü`,
-    description: menu.description ?? `${menu.name} menüsünü inceleyin.`,
-    alternates: { canonical: `${env.NEXT_PUBLIC_SITE_URL}/menu/${menu.slug}` },
+    title,
+    description: menu.description ?? metaDescription(locale, menu.name),
+    alternates: {
+      canonical,
+      // Tells search engines these are the same menu in two languages rather
+      // than duplicate pages competing with each other.
+      languages: { tr: base, en: `${base}?lang=en` },
+    },
     openGraph: {
-      url: `${env.NEXT_PUBLIC_SITE_URL}/menu/${menu.slug}`,
-      title: `${menu.name} · Menü`,
+      url: canonical,
+      title,
       description: menu.description ?? undefined,
       type: "website",
+      locale,
     },
     // Draft menus must never reach an index, even if the URL gets shared.
     robots: menu.is_published ? undefined : { index: false, follow: false },
   };
 }
 
-export default async function PublicMenuPage({ params }: Props) {
-  const { slug } = await params;
+export default async function PublicMenuPage({ params, searchParams }: Props) {
+  const [{ slug }, { lang }] = await Promise.all([params, searchParams]);
   const menu = await getPublicMenu(slug);
 
   if (!menu) notFound();
 
   const theme = resolveTheme(menu.theme);
+  const locale = resolveLocale(lang);
+  const strings = menuStrings(locale);
 
   // Flattened in display order, so the modal's prev/next walks the menu the way
   // the customer reads it rather than in database order.
   const galleryItems: GalleryItem[] = menu.categories.flatMap((category) =>
-    category.products.map((product) => ({
+    category.products.map((product) => {
+      const text = localize(product, product.translations, locale);
+      return {
       id: product.id,
-      name: product.name,
-      description: product.description,
+      name: text.name,
+      description: text.description,
       price: product.price,
       imageUrl: product.image_url,
       isAvailable: product.is_available,
       isFeatured: product.is_featured,
-    })),
+      };
+    }),
   );
 
   return (
@@ -85,7 +107,7 @@ export default async function PublicMenuPage({ params }: Props) {
       <MenuTracker slug={menu.slug} />
       <MenuJsonLd menu={menu} />
 
-      <MenuGalleryProvider items={galleryItems} currency={menu.currency}>
+      <MenuGalleryProvider items={galleryItems} currency={menu.currency} strings={strings}>
         <div className="relative mx-auto flex min-h-svh w-full max-w-2xl flex-col gap-10 px-5 py-10 sm:px-6">
           {!menu.is_published ? (
             <p
@@ -96,16 +118,26 @@ export default async function PublicMenuPage({ params }: Props) {
             </p>
           ) : null}
 
-          <MenuHeader restaurant={menu} />
+          <div className="flex justify-center">
+            <LanguageSwitcher current={locale} label={strings.languageLabel} />
+          </div>
+
+          <MenuHeader restaurant={menu} strings={strings} />
 
           {menu.categories.length === 0 ? (
             <p className="py-12 text-center text-sm" style={{ color: "var(--menu-muted)" }}>
-              Bu menü güncelleniyor. Lütfen kısa süre sonra tekrar bakın.
+              {strings.menuUpdating}
             </p>
           ) : (
             <main className="flex flex-col gap-12">
               {menu.categories.map((category) => (
-                <MenuSection key={category.id} category={category} currency={menu.currency} />
+                <MenuSection
+                key={category.id}
+                category={category}
+                currency={menu.currency}
+                locale={locale}
+                strings={strings}
+              />
               ))}
             </main>
           )}
@@ -118,7 +150,7 @@ export default async function PublicMenuPage({ params }: Props) {
               className="inline-block size-1.5 rounded-full"
               style={{ backgroundColor: "var(--menu-accent)" }}
             />
-            MenuQR ile hazırlandı
+            {strings.poweredBy}
           </footer>
         </div>
       </MenuGalleryProvider>

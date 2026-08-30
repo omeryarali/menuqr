@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth";
+import { buildTranslations } from "@/lib/i18n-form";
 import { removeImagesForCategory } from "@/lib/storage-cleanup";
 import { createClient } from "@/lib/supabase/server";
 import { categorySchema } from "@/lib/validators/category";
@@ -18,6 +19,8 @@ function parse(formData: FormData) {
     description: formData.get("description") ?? "",
     position: formData.get("position") ?? 0,
     isActive: formData.get("isActive") === "on",
+    nameEn: formData.get("nameEn") ?? "",
+    descriptionEn: formData.get("descriptionEn") ?? "",
   });
 }
 
@@ -40,6 +43,7 @@ export async function createCategory(_prev: ActionState, formData: FormData): Pr
     description: nullify(input.description),
     position: input.position,
     is_active: input.isActive,
+    translations: buildTranslations(input.nameEn, input.descriptionEn),
   });
 
   if (error) return errorState(error.message);
@@ -73,6 +77,7 @@ export async function updateCategory(
       description: nullify(input.description),
       position: input.position,
       is_active: input.isActive,
+      translations: buildTranslations(input.nameEn, input.descriptionEn),
     })
     .eq("id", id)
     .select("id");

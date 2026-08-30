@@ -6,6 +6,7 @@ import { Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { ProductImageField } from "@/components/dashboard/product-image-field";
+import { TranslationFields } from "@/components/dashboard/translation-fields";
 import { FieldError } from "@/components/shared/field-error";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -171,6 +172,11 @@ export function ProductDialog({ categories, product, defaultCategoryId, nextPosi
             defaultValue={product?.image_url}
             restaurantId={uploadRestaurantId}
             errors={fieldErrors?.imageUrl}
+          />
+
+          <TranslationFields
+            translations={product?.translations}
+            errors={{ nameEn: fieldErrors?.nameEn, descriptionEn: fieldErrors?.descriptionEn }}
           />
 
           <div className="flex items-center justify-between rounded-lg border p-3">

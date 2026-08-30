@@ -15,6 +15,10 @@ export const productSchema = z.object({
   imageUrl: z.string().trim().url("Geçerli bir görsel adresi girin").optional().or(z.literal("")),
   isAvailable: z.boolean(),
   isFeatured: z.boolean(),
+  // Optional English overrides. Empty strings are dropped by buildTranslations,
+  // so clearing a field falls back to Turkish rather than blanking the menu.
+  nameEn: z.string().trim().max(120, "İngilizce isim çok uzun").optional().or(z.literal("")),
+  descriptionEn: z.string().trim().max(500, "İngilizce açıklama çok uzun").optional().or(z.literal("")),
   position: z.coerce.number().int("Sıra tam sayı olmalı").min(0).max(9999).default(0),
 });
 

@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 
 import { ChevronLeft, ChevronRight, Star, X } from "lucide-react";
 
+import type { MenuStrings } from "@/lib/i18n";
 import { formatPrice } from "@/lib/utils/format";
 
 export type GalleryItem = {
@@ -44,10 +45,12 @@ export function useMenuGallery(): GalleryContextValue {
 export function MenuGalleryProvider({
   items,
   currency,
+  strings,
   children,
 }: {
   items: GalleryItem[];
   currency: string;
+  strings: MenuStrings;
   children: React.ReactNode;
 }) {
   const [index, setIndex] = useState<number | null>(null);
@@ -145,7 +148,7 @@ export function MenuGalleryProvider({
               style={{ backgroundColor: "var(--menu-bg)", border: "1px solid var(--menu-border)" }}
             >
               <X className="size-4" aria-hidden />
-              <span className="sr-only">Kapat</span>
+              <span className="sr-only">{strings.close}</span>
             </button>
 
             {item.imageUrl ? (
@@ -185,13 +188,13 @@ export function MenuGalleryProvider({
                   style={{ color: "var(--menu-accent)" }}
                 >
                   <Star className="size-3 fill-current" aria-hidden />
-                  Şefin önerisi
+                  {strings.featured}
                 </p>
               ) : null}
 
               {!item.isAvailable ? (
                 <p className="text-xs" style={{ color: "var(--menu-muted)" }}>
-                  Şu anda tükendi.
+                  {strings.soldOutLong}
                 </p>
               ) : null}
 
@@ -210,7 +213,7 @@ export function MenuGalleryProvider({
                     style={{ borderColor: "var(--menu-border)" }}
                   >
                     <ChevronLeft className="size-4" aria-hidden />
-                    Önceki
+                    {strings.previous}
                   </button>
                   <span className="text-xs tabular-nums" style={{ color: "var(--menu-muted)" }}>
                     {(index ?? 0) + 1} / {items.length}
@@ -221,7 +224,7 @@ export function MenuGalleryProvider({
                     className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-sm transition-opacity hover:opacity-80"
                     style={{ borderColor: "var(--menu-border)" }}
                   >
-                    Sonraki
+                    {strings.next}
                     <ChevronRight className="size-4" aria-hidden />
                   </button>
                 </div>

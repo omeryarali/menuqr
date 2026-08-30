@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 import { useMenuGallery } from "@/components/menu/menu-gallery";
+import type { MenuStrings } from "@/lib/i18n";
 import { isUploadedImage } from "@/lib/storage";
 
 /**
@@ -18,7 +19,17 @@ import { isUploadedImage } from "@/lib/storage";
  * Hides itself if the URL fails to load, so a dead link leaves a clean text row
  * instead of a broken-image icon on a customer's phone.
  */
-export function MenuImage({ src, alt, productId }: { src: string; alt: string; productId: string }) {
+export function MenuImage({
+  src,
+  alt,
+  productId,
+  strings,
+}: {
+  src: string;
+  alt: string;
+  productId: string;
+  strings: MenuStrings;
+}) {
   const [failed, setFailed] = useState(false);
   const { open, hasItem } = useMenuGallery();
 
@@ -66,7 +77,7 @@ export function MenuImage({ src, alt, productId }: { src: string; alt: string; p
       onClick={() => open(productId)}
       className={`${frame} cursor-pointer transition-opacity hover:opacity-85`}
       style={{ borderColor: "var(--menu-border)" }}
-      aria-label={`${alt} — büyük görseli aç`}
+      aria-label={`${alt} — ${strings.openImage}`}
     >
       {inner}
     </button>

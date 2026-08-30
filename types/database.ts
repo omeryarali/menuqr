@@ -86,6 +86,8 @@ export interface Database {
           description: string | null;
           position: number;
           is_active: boolean;
+          /** Translations shape; narrow with parseTranslations() before use. */
+          translations: Json | null;
           created_at: string;
           updated_at: string;
         };
@@ -96,12 +98,14 @@ export interface Database {
           description?: string | null;
           position?: number;
           is_active?: boolean;
+          translations?: Json | null;
         };
         Update: {
           name?: string;
           description?: string | null;
           position?: number;
           is_active?: boolean;
+          translations?: Json | null;
         };
         Relationships: [];
       };
@@ -117,6 +121,8 @@ export interface Database {
           is_available: boolean;
           is_featured: boolean;
           position: number;
+          /** Translations shape; narrow with parseTranslations() before use. */
+          translations: Json | null;
           created_at: string;
           updated_at: string;
         };
@@ -136,6 +142,7 @@ export interface Database {
           is_available?: boolean;
           is_featured?: boolean;
           position?: number;
+          translations?: Json | null;
         };
         Update: {
           category_id?: string;
@@ -146,6 +153,7 @@ export interface Database {
           is_available?: boolean;
           is_featured?: boolean;
           position?: number;
+          translations?: Json | null;
         };
         Relationships: [];
       };

@@ -97,6 +97,23 @@ strings go in Turkish, inline. `<html lang="tr">`.
 - Supabase auth emails are **not** covered by any of this; they're configured in the Supabase
   dashboard (Authentication → Email Templates) and ship in English by default.
 
+## Menu translations (TR/EN)
+
+The **public menu** is bilingual; the dashboard is not. Turkish is the base and lives in the ordinary
+`name`/`description` columns — `translations` JSONB (migration `0013`) only holds overrides, so an
+untranslated menu behaves exactly as before and a half-finished one falls back field by field.
+Restaurant names are deliberately not translatable.
+
+- Locale comes from `?lang=en`, never a cookie or state: a shared link then carries the language, and
+  the base locale drops the parameter so the canonical Turkish URL stays identical to what the QR
+  encodes.
+- **`MenuStrings` must stay serialisable.** It is passed as a prop into client components, and a
+  function anywhere in it fails at runtime with "Functions cannot be passed directly to Client
+  Components" — which typecheck and build both pass. That is why `metaDescription()` is a standalone
+  function rather than a key.
+- Translations inherit the parent row's RLS, which is the reason for JSONB over a child table: a
+  translation can never be more or less visible than the thing it translates.
+
 ## Analytics
 
 `menu_events` (migration `0005`) is an append-only log of public-menu opens. Its RLS is deliberately

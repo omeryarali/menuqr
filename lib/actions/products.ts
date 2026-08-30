@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth";
+import { buildTranslations } from "@/lib/i18n-form";
 import { computeNewPrice, type PriceChange } from "@/lib/pricing";
 import { removeProductImage } from "@/lib/storage-cleanup";
 import { createClient } from "@/lib/supabase/server";
@@ -22,6 +23,8 @@ function parse(formData: FormData) {
     imageUrl: formData.get("imageUrl") ?? "",
     isAvailable: formData.get("isAvailable") === "on",
     isFeatured: formData.get("isFeatured") === "on",
+    nameEn: formData.get("nameEn") ?? "",
+    descriptionEn: formData.get("descriptionEn") ?? "",
     position: formData.get("position") ?? 0,
   });
 }
@@ -50,6 +53,7 @@ export async function createProduct(_prev: ActionState, formData: FormData): Pro
     is_available: input.isAvailable,
     is_featured: input.isFeatured,
     position: input.position,
+    translations: buildTranslations(input.nameEn, input.descriptionEn),
   });
 
   if (error) return errorState(error.message);
@@ -86,6 +90,7 @@ export async function updateProduct(id: string, _prev: ActionState, formData: Fo
       is_available: input.isAvailable,
       is_featured: input.isFeatured,
       position: input.position,
+      translations: buildTranslations(input.nameEn, input.descriptionEn),
     })
     .eq("id", id)
     .select("id");

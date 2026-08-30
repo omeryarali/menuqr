@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
 
+import { TranslationFields } from "@/components/dashboard/translation-fields";
 import { FieldError } from "@/components/shared/field-error";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -158,6 +159,11 @@ export function CategoryDialog({ restaurants, category, defaultRestaurantId, nex
             <p className="text-muted-foreground text-xs">Küçük sayılar menüde önce görünür.</p>
             <FieldError messages={fieldErrors?.position} />
           </div>
+
+          <TranslationFields
+            translations={category?.translations}
+            errors={{ nameEn: fieldErrors?.nameEn, descriptionEn: fieldErrors?.descriptionEn }}
+          />
 
           <div className="flex items-center justify-between rounded-lg border p-3">
             <Label htmlFor="category-active">Menüde göster</Label>

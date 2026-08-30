@@ -1,6 +1,7 @@
 "use client";
 
 import { useMenuGallery } from "@/components/menu/menu-gallery";
+import type { MenuStrings } from "@/lib/i18n";
 
 /**
  * Product name on the menu, clickable to open the detail modal.
@@ -9,7 +10,15 @@ import { useMenuGallery } from "@/components/menu/menu-gallery";
  * change depending on whether the gallery is available; only the inner element
  * becomes a button.
  */
-export function ProductName({ productId, name }: { productId: string; name: string }) {
+export function ProductName({
+  productId,
+  name,
+  strings,
+}: {
+  productId: string;
+  name: string;
+  strings: MenuStrings;
+}) {
   const { open, hasItem } = useMenuGallery();
   const style = { fontFamily: "var(--menu-heading-font)" };
 
@@ -27,7 +36,7 @@ export function ProductName({ productId, name }: { productId: string; name: stri
         type="button"
         onClick={() => open(productId)}
         className="cursor-pointer text-left hover:underline"
-        aria-label={`${name} — ayrıntıları aç`}
+        aria-label={`${name} — ${strings.openDetailsFor}`}
       >
         {name}
       </button>
