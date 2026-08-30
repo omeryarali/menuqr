@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-import { PrintSheet } from "./print-controls";
-
+import { PrintSheet } from "@/components/dashboard/print-sheet";
 import { requireUser } from "@/lib/auth";
 import { menuUrl, qrTargetUrl, renderQrDataUrl } from "@/lib/qr";
 import { getRestaurant } from "@/services/restaurants";
@@ -89,23 +88,31 @@ export default async function QrPrintPage({ params }: Props) {
       `}</style>
 
       <PrintSheet
-        poster={
-          <div className="print-sheet mx-auto w-full max-w-3xl p-4">
-            <div className="mx-auto max-w-lg">{poster}</div>
-          </div>
-        }
-        cards={
-          <div className="print-sheet mx-auto w-full max-w-3xl p-4">
-            <div className="card-grid grid grid-cols-2 gap-4">
-              {[0, 1, 2, 3, 4, 5].map((i) => (
-                <div key={i}>{tableCard}</div>
-              ))}
+        backHref="/dashboard/qr-codes"
+        backLabel="Karekodlar"
+        options={[
+          { value: "poster", label: "Poster" },
+          { value: "cards", label: "Masa kartı" },
+        ]}
+        views={{
+          poster: (
+            <div className="print-sheet mx-auto w-full max-w-3xl p-4">
+              <div className="mx-auto max-w-lg">{poster}</div>
             </div>
-            <p className="text-muted-foreground mt-4 text-center text-xs print:hidden">
-              Altı kart tek A4 sayfada — yazdırdıktan sonra kenarlardan kesip masalara koyabilirsiniz.
-            </p>
-          </div>
-        }
+          ),
+          cards: (
+            <div className="print-sheet mx-auto w-full max-w-3xl p-4">
+              <div className="card-grid grid grid-cols-2 gap-4">
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <div key={i}>{tableCard}</div>
+                ))}
+              </div>
+              <p className="text-muted-foreground mt-4 text-center text-xs print:hidden">
+                Altı kart tek A4 sayfada — yazdırdıktan sonra kenarlardan kesip masalara koyabilirsiniz.
+              </p>
+            </div>
+          ),
+        }}
       />
     </div>
   );

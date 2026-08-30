@@ -165,8 +165,13 @@ degrades a malformed week to "no hours" rather than throwing on a customer's men
 - `components/menu/menu-json-ld.tsx` emits schema.org Restaurant + Menu, and skips unpublished
   restaurants entirely (they are noindex anyway). The payload is JSON.stringify'd with `<` escaped,
   so a product name can't break out of the script tag.
-- `/qr-print/[id]` lives **outside** the `(dashboard)` group so the sidebar never reaches the paper —
-  which makes auth its own responsibility (`requireUser` + owner-scoped `getRestaurant`).
+- `/qr-print/[id]` and `/menu-print/[id]` live **outside** the `(dashboard)` group so the sidebar
+  never reaches the paper — which makes auth their own responsibility (`requireUser` + owner-scoped
+  `getRestaurant`). Both drive layout switching through `components/dashboard/print-sheet.tsx`.
+- Print layouts must not depend on Tailwind's responsive prefixes. `sm:` and friends key off the
+  viewport, and if the print layout measures narrower than the breakpoint the rule silently drops —
+  a two-column menu quietly prints as one. Put print rules in the page's own `@media print` block
+  (see `.menu-two-col`).
 
 ## Bulk pricing
 

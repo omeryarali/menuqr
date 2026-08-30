@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Printer } from "lucide-react";
 
 import { PageHeader } from "@/components/dashboard/page-header";
 import { RestaurantForm } from "@/components/dashboard/restaurant-form";
@@ -36,15 +36,21 @@ export default async function RestaurantDetailPage({ params }: Props) {
         title={restaurant.name}
         description={`/menu/${restaurant.slug}`}
         action={
-          restaurant.is_published ? (
-            <Button
-              variant="outline"
-              render={<Link href={`/menu/${restaurant.slug}`} target="_blank" rel="noreferrer" />}
-            >
-              <ExternalLink className="size-4" aria-hidden />
-              Menüyü görüntüle
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" render={<Link href={`/menu-print/${id}`} />}>
+              <Printer className="size-4" aria-hidden />
+              Menüyü yazdır
             </Button>
-          ) : null
+            {restaurant.is_published ? (
+              <Button
+                variant="outline"
+                render={<Link href={`/menu/${restaurant.slug}`} target="_blank" rel="noreferrer" />}
+              >
+                <ExternalLink className="size-4" aria-hidden />
+                Menüyü görüntüle
+              </Button>
+            ) : null}
+          </div>
         }
       />
 
