@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { BulkPriceDialog, type PricableProduct } from "@/components/dashboard/bulk-price-dialog";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { ProductDialog } from "@/components/dashboard/product-dialog";
 import { RestaurantSwitcher } from "@/components/dashboard/restaurant-switcher";
@@ -63,12 +64,32 @@ export default async function ProductsPage({ searchParams }: Props) {
     // the first product to one.
     .filter((group) => group.products.length > 0);
 
+  // Flat list for the bulk price dialog, carrying each product's own currency
+  // (a filter of "all restaurants" can span more than one).
+  const pricable: PricableProduct[] = groups.flatMap((group) =>
+    group.products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      categoryId: group.category.id,
+      currency: group.currency,
+    })),
+  );
+
   return (
     <>
       <PageHeader
         title="Ürünler"
         description="Menünüzdeki ürünler."
-        action={<ProductDialog categories={categories} nextPosition={products.length} />}
+        action={
+          <div className="flex flex-wrap gap-2">
+            <BulkPriceDialog
+              products={pricable}
+              categories={groups.map((group) => ({ id: group.category.id, name: group.category.name }))}
+            />
+            <ProductDialog categories={categories} nextPosition={products.length} />
+          </div>
+        }
       />
 
       <Suspense fallback={<Skeleton className="h-10 w-64" />}>

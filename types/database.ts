@@ -169,6 +169,7 @@ export interface Database {
       is_restaurant_published: { Args: { p_restaurant_id: string }; Returns: boolean };
       reorder_categories: { Args: { p_ids: string[] }; Returns: undefined };
       reorder_products: { Args: { p_ids: string[] }; Returns: undefined };
+      set_product_prices: { Args: { p_updates: Json }; Returns: undefined };
       menu_event_daily_counts: {
         Args: { p_days?: number; p_restaurant_id?: string | null };
         Returns: { day: string; event_type: string; event_count: number }[];

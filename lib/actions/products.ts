@@ -3,9 +3,11 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth";
+import { computeNewPrice, type PriceChange } from "@/lib/pricing";
 import { removeProductImage } from "@/lib/storage-cleanup";
 import { createClient } from "@/lib/supabase/server";
 import { productSchema } from "@/lib/validators/product";
+import { listOwnedRestaurantIds } from "@/services/restaurants";
 
 import { errorState, type ActionState } from "./types";
 
@@ -152,4 +154,51 @@ export async function toggleProductAvailability(id: string, isAvailable: boolean
   revalidatePath("/dashboard/products");
   revalidatePath("/menu", "layout");
   return { status: "success", message: isAvailable ? "Ürün mevcut olarak işaretlendi." : "Ürün tükendi olarak işaretlendi." };
+}
+
+/**
+ * Applies a previewed bulk price change.
+ *
+ * Recomputes every price from the change spec rather than trusting the numbers
+ * the client sends: the browser has already shown the owner a preview, and this
+ * makes the written values provably the same ones — a tampered or stale payload
+ * cannot slip a different price through.
+ *
+ * Product ids are still scoped: only rows the caller owns are fetched, so the
+ * update can only ever touch their own menu.
+ */
+export async function bulkUpdatePrices(productIds: string[], change: PriceChange): Promise<ActionState> {
+  await requireUser();
+  if (productIds.length === 0) return { status: "success", message: "Değişecek fiyat yok." };
+
+  const supabase = await createClient();
+
+  const ownedIds = await listOwnedRestaurantIds();
+  if (ownedIds.length === 0) return errorState("Restoran bulunamadı.");
+
+  const { data: products, error: readError } = await supabase
+    .from("products")
+    .select("id, price")
+    .in("id", productIds)
+    .in("restaurant_id", ownedIds);
+
+  if (readError) return errorState(readError.message);
+  if (!products?.length) return errorState("Güncellenecek ürün bulunamadı.");
+
+  // One pass, no index pairing between two arrays - that is exactly the kind of
+  // off-by-one that silently misprices a menu.
+  const updates: { id: string; price: number }[] = [];
+  for (const product of products) {
+    const price = computeNewPrice(product.price, change);
+    if (price !== product.price) updates.push({ id: product.id, price });
+  }
+
+  if (updates.length === 0) return { status: "success", message: "Fiyatlar zaten güncel." };
+
+  const { error } = await supabase.rpc("set_product_prices", { p_updates: updates });
+  if (error) return errorState(error.message);
+
+  revalidatePath("/dashboard/products");
+  revalidatePath("/menu", "layout");
+  return { status: "success", message: `${updates.length} ürünün fiyatı güncellendi.` };
 }

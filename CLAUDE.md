@@ -168,6 +168,19 @@ degrades a malformed week to "no hours" rather than throwing on a customer's men
 - `/qr-print/[id]` lives **outside** the `(dashboard)` group so the sidebar never reaches the paper —
   which makes auth its own responsibility (`requireUser` + owner-scoped `getRestaurant`).
 
+## Bulk pricing
+
+`lib/pricing.ts` is shared on purpose: the dialog previews with `computeNewPrice` and
+`bulkUpdatePrices` re-runs the same function server-side before writing. The action deliberately
+ignores the prices the client sends and recomputes from the change spec, so a preview can never show
+one number and save another.
+
+`computeNewPrice` clamps at both ends — a discount larger than the price lands on 0 rather than a
+negative the CHECK would reject, and the result never exceeds what `numeric(10,2)` holds.
+
+`set_product_prices` (migration `0011`) takes JSONB, not parallel id/price arrays: pairing two arrays
+by index is how a menu silently gets mispriced. SECURITY INVOKER, like the reorder RPCs.
+
 ## Out of scope
 
 Theme builder, subscriptions, multi-user roles, per-table QR codes.
