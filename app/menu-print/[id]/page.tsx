@@ -10,6 +10,7 @@ import {
   formatDayHours,
   parseOpeningHours,
 } from "@/lib/opening-hours";
+import { formatTrPhone } from "@/lib/phone";
 import { qrTargetUrl, renderQrDataUrl } from "@/lib/qr";
 import { formatPrice } from "@/lib/utils/format";
 import { getPublicMenu } from "@/services/menu";
@@ -51,7 +52,7 @@ export default async function MenuPrintPage({ params }: Props) {
       {menu.description ? <p className="text-sm">{menu.description}</p> : null}
       {menu.address || menu.phone ? (
         <p className="text-muted-foreground text-xs">
-          {[menu.address, menu.phone].filter(Boolean).join(" · ")}
+          {[menu.address, formatTrPhone(menu.phone)].filter(Boolean).join(" · ")}
         </p>
       ) : null}
     </header>

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { FieldError } from "@/components/shared/field-error";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { OpeningHoursField } from "@/components/dashboard/opening-hours-field";
+import { PhoneField } from "@/components/dashboard/phone-field";
 import { ThemePicker } from "@/components/dashboard/theme-picker";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
@@ -139,7 +140,7 @@ export function RestaurantForm({ action, restaurant }: Props) {
 
       <div className="space-y-2">
         <Label htmlFor="phone">Telefon</Label>
-        <Input id="phone" name="phone" type="tel" defaultValue={restaurant?.phone ?? ""} />
+        <PhoneField defaultValue={restaurant?.phone} />
         <FieldError messages={fieldErrors?.phone} />
       </div>
 

@@ -1,5 +1,6 @@
 import { env } from "@/lib/env";
 import { parseOpeningHours, toSchemaOpeningHours } from "@/lib/opening-hours";
+import { normalizeTrPhone } from "@/lib/phone";
 import type { PublicMenu } from "@/types/database";
 
 /**
@@ -25,7 +26,8 @@ export function MenuJsonLd({ menu }: { menu: PublicMenu }) {
     name: menu.name,
     url,
     ...(menu.description ? { description: menu.description } : {}),
-    ...(menu.phone ? { telephone: menu.phone } : {}),
+    // schema.org wants E.164; the column already holds it.
+    ...(menu.phone ? { telephone: normalizeTrPhone(menu.phone) ?? menu.phone } : {}),
     ...(menu.address ? { address: { "@type": "PostalAddress", streetAddress: menu.address } } : {}),
     ...(toSchemaOpeningHours(parseOpeningHours(menu.opening_hours))
       ? { openingHoursSpecification: toSchemaOpeningHours(parseOpeningHours(menu.opening_hours)) }

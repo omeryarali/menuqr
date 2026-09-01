@@ -3,6 +3,7 @@ import { MapPin, Phone } from "lucide-react";
 import { MenuHours } from "@/components/menu/menu-hours";
 import type { MenuStrings } from "@/lib/i18n";
 import { parseOpeningHours } from "@/lib/opening-hours";
+import { formatTrPhone, normalizeTrPhone } from "@/lib/phone";
 
 import type { Restaurant } from "@/types/database";
 
@@ -45,9 +46,14 @@ export function MenuHeader({ restaurant, strings }: { restaurant: Restaurant; st
             </span>
           ) : null}
           {restaurant.phone ? (
-            <a href={`tel:${restaurant.phone}`} className="inline-flex items-center gap-1.5 hover:underline">
+            <a
+              // The stored value is already +90XXXXXXXXXX; normalizing again
+              // covers a row written before migration 0015.
+              href={`tel:${normalizeTrPhone(restaurant.phone) ?? restaurant.phone}`}
+              className="inline-flex items-center gap-1.5 hover:underline"
+            >
               <Phone className="size-3.5" style={{ color: "var(--menu-accent)" }} aria-hidden />
-              {restaurant.phone}
+              {formatTrPhone(restaurant.phone)}
             </a>
           ) : null}
         </div>
