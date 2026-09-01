@@ -43,6 +43,9 @@ export interface Database {
           slug: string;
           description: string | null;
           address: string | null;
+          /** Set together with longitude, or both null — see migration 0016. */
+          latitude: number | null;
+          longitude: number | null;
           phone: string | null;
           currency: string;
           is_published: boolean;
@@ -59,6 +62,8 @@ export interface Database {
           slug: string;
           description?: string | null;
           address?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
           phone?: string | null;
           currency?: string;
           is_published?: boolean;
@@ -70,6 +75,8 @@ export interface Database {
           slug?: string;
           description?: string | null;
           address?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
           phone?: string | null;
           currency?: string;
           is_published?: boolean;

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { FieldError } from "@/components/shared/field-error";
 import { SubmitButton } from "@/components/shared/submit-button";
+import { AddressField } from "@/components/dashboard/address-field";
 import { OpeningHoursField } from "@/components/dashboard/opening-hours-field";
 import { PhoneField } from "@/components/dashboard/phone-field";
 import { ThemePicker } from "@/components/dashboard/theme-picker";
@@ -107,14 +108,17 @@ export function RestaurantForm({ action, restaurant }: Props) {
         <FieldError messages={fieldErrors?.description} />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="address">Adres</Label>
-          <Input id="address" name="address" defaultValue={restaurant?.address ?? ""} />
-          <FieldError messages={fieldErrors?.address} />
-        </div>
+      <div className="space-y-2">
+        <AddressField
+          defaultAddress={restaurant?.address ?? ""}
+          defaultLatitude={restaurant?.latitude ?? null}
+          defaultLongitude={restaurant?.longitude ?? null}
+        />
+        <FieldError messages={fieldErrors?.address} />
+        <FieldError messages={fieldErrors?.latitude} />
+      </div>
 
-        <div className="space-y-2">
+      <div className="space-y-2 sm:max-w-xs">
           <Label htmlFor="currency">Para birimi</Label>
           <Select
             name="currency"
@@ -135,7 +139,6 @@ export function RestaurantForm({ action, restaurant }: Props) {
             </SelectContent>
           </Select>
           <FieldError messages={fieldErrors?.currency} />
-        </div>
       </div>
 
       <div className="space-y-2">
