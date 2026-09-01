@@ -106,6 +106,10 @@ export type MenuStrings = {
   openDetailsFor: string;
   menuSuffix: string;
   languageLabel: string;
+  /** Item count next to a collapsed category. Turkish takes no plural after a
+   *  number, so both keys are the same word there. */
+  itemOne: string;
+  itemMany: string;
   /** Monday-first, matching DAY_KEYS in lib/opening-hours.ts. */
   days: readonly string[];
 };
@@ -129,6 +133,8 @@ const STRINGS: Record<Locale, MenuStrings> = {
     openDetailsFor: "ayrıntıları aç",
     menuSuffix: "Menü",
     languageLabel: "Dil",
+    itemOne: "ürün",
+    itemMany: "ürün",
     days: ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"],
   },
   en: {
@@ -149,6 +155,8 @@ const STRINGS: Record<Locale, MenuStrings> = {
     openDetailsFor: "open details",
     menuSuffix: "Menu",
     languageLabel: "Language",
+    itemOne: "item",
+    itemMany: "items",
     days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
   },
 };

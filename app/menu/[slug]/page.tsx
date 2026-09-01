@@ -92,6 +92,22 @@ export default async function PublicMenuPage({ params, searchParams }: Props) {
       className="relative min-h-svh w-full bg-[var(--menu-bg)] text-[var(--menu-fg)]"
       style={{ fontFamily: "var(--menu-body-font)" }}
     >
+      {/* Every category is a native <details> and starts collapsed. Print rules
+          live here rather than in a Tailwind `print:` class because the sections
+          must open on paper regardless of viewport, and the two selectors cover
+          both ways browsers hide the closed content. */}
+      <style>{`
+        @media print {
+          details::details-content {
+            content-visibility: visible !important;
+            block-size: auto !important;
+          }
+          details:not([open]) > *:not(summary) { display: block !important; }
+          .menu-section-chevron { display: none !important; }
+          summary { cursor: auto; }
+        }
+      `}</style>
+
       {/* Soft glow behind the header so the page doesn't read as a flat slab. */}
       <div
         aria-hidden
@@ -137,6 +153,7 @@ export default async function PublicMenuPage({ params, searchParams }: Props) {
                 currency={menu.currency}
                 locale={locale}
                 strings={strings}
+                defaultOpen={menu.categories.length === 1}
               />
               ))}
             </main>
