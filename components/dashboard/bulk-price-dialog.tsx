@@ -5,6 +5,7 @@ import { useMemo, useState, useTransition } from "react";
 import { Loader2, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
+import { FieldError } from "@/components/shared/field-error";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,13 +20,16 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { bulkUpdatePrices } from "@/lib/actions/products";
 import {
+  parsePriceInput,
   previewPriceChange,
+  priceChangeIssue,
   type PriceChange,
   type PriceDirection,
   type PriceMode,
   type RoundingStep,
 } from "@/lib/pricing";
 import { formatPrice } from "@/lib/utils/format";
+import { PRICE_CHANGE_MESSAGES } from "@/lib/validators/pricing";
 
 export type PricableProduct = {
   id: string;
@@ -71,12 +75,18 @@ export function BulkPriceDialog({
     () => ({
       mode,
       direction,
-      // Turkish keyboards produce a comma decimal separator.
-      value: Number(value.replace(",", ".")) || 0,
+      // An empty box is not an error, just nothing to do yet.
+      value: parsePriceInput(value) ?? 0,
       rounding: Number(rounding) as RoundingStep,
     }),
     [mode, direction, value, rounding],
   );
+
+  // The direction selector owns the sign, so a typed "-10" is rejected instead
+  // of quietly turning a raise into a discount. computeNewPrice treats the same
+  // spec as a no-op, which is why the preview below empties out on its own.
+  const issue = priceChangeIssue(change);
+  const error = issue ? PRICE_CHANGE_MESSAGES[issue] : null;
 
   const scoped = useMemo(
     () => (scope === "all" ? products : products.filter((p) => p.categoryId === scope)),
@@ -87,6 +97,8 @@ export function BulkPriceDialog({
   const currency = scoped[0]?.currency ?? "TRY";
 
   function apply() {
+    if (error) return;
+
     startTransition(async () => {
       const result = await bulkUpdatePrices(
         preview.map((row) => row.id),
@@ -180,12 +192,17 @@ export function BulkPriceDialog({
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="bulk-value">{mode === "percent" ? "Oran (%)" : "Tutar"}</Label>
+              {/* Text, not type="number": a Turkish keyboard types "1,5" and a
+                  number input silently reports that as empty. min= would be
+                  ignored here anyway, so the sign is checked in code. */}
               <Input
                 id="bulk-value"
                 inputMode="decimal"
                 value={value}
+                aria-invalid={error ? true : undefined}
                 onChange={(event) => setValue(event.target.value)}
               />
+              <FieldError messages={error ? [error] : undefined} />
             </div>
 
             <div className="space-y-2">
@@ -233,7 +250,11 @@ export function BulkPriceDialog({
             )}
           </div>
 
-          <Button className="w-full" onClick={apply} disabled={pending || preview.length === 0}>
+          <Button
+            className="w-full"
+            onClick={apply}
+            disabled={pending || Boolean(error) || preview.length === 0}
+          >
             {pending ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
             {preview.length > 0 ? `${preview.length} ürünü güncelle` : "Güncelle"}
           </Button>

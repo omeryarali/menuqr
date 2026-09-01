@@ -7,6 +7,7 @@ import { buildTranslations } from "@/lib/i18n-form";
 import { computeNewPrice, type PriceChange } from "@/lib/pricing";
 import { removeProductImage } from "@/lib/storage-cleanup";
 import { createClient } from "@/lib/supabase/server";
+import { priceChangeSchema } from "@/lib/validators/pricing";
 import { productSchema } from "@/lib/validators/product";
 import { listOwnedRestaurantIds } from "@/services/restaurants";
 
@@ -177,6 +178,16 @@ export async function toggleProductAvailability(id: string, isAvailable: boolean
  */
 export async function bulkUpdatePrices(productIds: string[], change: PriceChange): Promise<ActionState> {
   await requireUser();
+
+  // The spec is network input, whatever the signature says. Validate before the
+  // arithmetic: a negative value must be an error here too, not just a disabled
+  // button in the dialog.
+  const parsed = priceChangeSchema.safeParse(change);
+  if (!parsed.success) {
+    return errorState(parsed.error.issues[0]?.message ?? "Geçersiz fiyat değişikliği.");
+  }
+  const spec = parsed.data;
+
   if (productIds.length === 0) return { status: "success", message: "Değişecek fiyat yok." };
 
   const supabase = await createClient();
@@ -197,7 +208,7 @@ export async function bulkUpdatePrices(productIds: string[], change: PriceChange
   // off-by-one that silently misprices a menu.
   const updates: { id: string; price: number }[] = [];
   for (const product of products) {
-    const price = computeNewPrice(product.price, change);
+    const price = computeNewPrice(product.price, spec);
     if (price !== product.price) updates.push({ id: product.id, price });
   }
 
