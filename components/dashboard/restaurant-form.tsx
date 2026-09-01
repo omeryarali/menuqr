@@ -11,9 +11,23 @@ import { ThemePicker } from "@/components/dashboard/theme-picker";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { idleState, type ActionState } from "@/lib/actions/types";
+import {
+  CURRENCY_CODES,
+  CURRENCY_LABELS,
+  DEFAULT_CURRENCY,
+  normalizeCurrency,
+  type CurrencyCode,
+} from "@/lib/currencies";
 import { parseOpeningHours } from "@/lib/opening-hours";
 import { slugify } from "@/lib/utils/slug";
 import type { Restaurant } from "@/types/database";
@@ -26,6 +40,12 @@ type Props = {
 export function RestaurantForm({ action, restaurant }: Props) {
   const [state, formAction] = useActionState(action, idleState);
   const [slug, setSlug] = useState(restaurant?.slug ?? "");
+  // A code from before the picker existed that is not on the list falls back to
+  // TRY rather than leaving the trigger blank. Migration 0014 rewrites those
+  // rows, so this only covers a row saved between deploy and migration.
+  const [currency, setCurrency] = useState<CurrencyCode>(
+    normalizeCurrency(restaurant?.currency) ?? DEFAULT_CURRENCY,
+  );
 
   // Stop auto-filling the slug from the name once the user edits it by hand,
   // or once we're editing a saved restaurant (whose URL is already public).
@@ -95,14 +115,24 @@ export function RestaurantForm({ action, restaurant }: Props) {
 
         <div className="space-y-2">
           <Label htmlFor="currency">Para birimi</Label>
-          <Input
-            id="currency"
+          <Select
             name="currency"
-            maxLength={3}
-            className="uppercase"
-            defaultValue={restaurant?.currency ?? "TRY"}
+            value={currency}
+            onValueChange={(next) => next && setCurrency(next as CurrencyCode)}
+            items={CURRENCY_LABELS}
             required
-          />
+          >
+            <SelectTrigger id="currency" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CURRENCY_CODES.map((code) => (
+                <SelectItem key={code} value={code}>
+                  {CURRENCY_LABELS[code]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <FieldError messages={fieldErrors?.currency} />
         </div>
       </div>
