@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { QrCard } from "@/components/dashboard/qr-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
-import { menuUrl, qrTargetUrl, renderQrDataUrl } from "@/lib/qr";
+import { menuUrl, qrTargetUrl, renderFramedQrSvg } from "@/lib/qr";
 import { listRestaurants } from "@/services/restaurants";
 
 export const metadata: Metadata = { title: "Karekodlar" };
@@ -13,19 +13,15 @@ export const metadata: Metadata = { title: "Karekodlar" };
 export default async function QrCodesPage() {
   const restaurants = await listRestaurants();
 
-  // Previews are rendered server-side, in parallel. Cheap enough at MVP scale;
-  // if the restaurant count grows, move this behind Suspense per card.
-  const cards = await Promise.all(
-    restaurants.map(async (restaurant) => {
-      return {
-        ...restaurant,
-        // Shown and copied: the clean URL. Encoded in the image: the ?src=qr
-        // variant, so the preview matches what the download actually contains.
-        menuUrl: menuUrl(restaurant.slug),
-        previewDataUrl: await renderQrDataUrl(qrTargetUrl(restaurant.slug)),
-      };
-    }),
-  );
+  // The same SVG string is the preview, the SVG download and the source the
+  // card rasterizes the PNG from, so all three are provably the same artwork.
+  const cards = restaurants.map((restaurant) => ({
+    ...restaurant,
+    // Shown and copied: the clean URL. Encoded in the image: the ?src=qr
+    // variant, so the preview matches what the download actually contains.
+    menuUrl: menuUrl(restaurant.slug),
+    qrSvg: renderFramedQrSvg(qrTargetUrl(restaurant.slug)),
+  }));
 
   return (
     <>
@@ -50,7 +46,7 @@ export default async function QrCodesPage() {
               name={card.name}
               slug={card.slug}
               menuUrl={card.menuUrl}
-              previewDataUrl={card.previewDataUrl}
+              qrSvg={card.qrSvg}
               isPublished={card.is_published}
             />
           ))}

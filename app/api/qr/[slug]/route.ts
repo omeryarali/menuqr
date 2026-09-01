@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { clampSize, qrTargetUrl, renderQrPng, renderQrSvg, type QrFormat } from "@/lib/qr";
+import { clampSize, qrTargetUrl, renderFramedQrSvg, renderQrPng, type QrFormat } from "@/lib/qr";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -9,6 +9,12 @@ import { createClient } from "@/lib/supabase/server";
  * Scoped to a real restaurant slug on purpose. Accepting an arbitrary ?data=
  * would turn this into an open QR generator anyone could point at a phishing
  * URL while wearing this app's domain.
+ *
+ * SVG carries the frame and the call to action; PNG is the bare code. Drawing
+ * the caption server-side would need a font rasterizer (sharp, node-canvas),
+ * which is a heavy dependency for one line of text — so the dashboard builds
+ * the framed PNG in the browser from the SVG this route returns, and this
+ * branch stays the raw-code endpoint.
  */
 export async function GET(request: NextRequest, context: { params: Promise<{ slug: string }> }) {
   const { slug } = await context.params;
@@ -47,7 +53,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ slu
   };
 
   if (format === "svg") {
-    const svg = await renderQrSvg(target, size);
+    const svg = renderFramedQrSvg(target, size);
     return new NextResponse(svg, {
       headers: { ...headers, "Content-Type": "image/svg+xml; charset=utf-8" },
     });

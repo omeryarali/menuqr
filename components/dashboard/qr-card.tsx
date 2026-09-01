@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import Link from "next/link";
 
-import { Check, Copy, Download, Printer } from "lucide-react";
+import { Check, Copy, Download, Loader2, Printer } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -20,18 +19,72 @@ export function QrCard({
   name,
   slug,
   menuUrl,
-  previewDataUrl,
+  qrSvg,
   isPublished,
 }: {
   id: string;
   name: string;
   slug: string;
   menuUrl: string;
-  previewDataUrl: string;
+  /** The framed artwork, rendered on the server. Preview, SVG and PNG all
+   *  come from this one string, so they cannot drift apart. */
+  qrSvg: string;
   isPublished: boolean;
 }) {
   const [size, setSize] = useState<string>("512");
   const [copied, setCopied] = useState(false);
+  const [rendering, setRendering] = useState(false);
+
+  const svgUrl = useMemo(
+    () => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(qrSvg)}`,
+    [qrSvg],
+  );
+
+  /**
+   * PNG from the same SVG, drawn in the browser.
+   *
+   * The server cannot rasterize the caption without a font rasterizer, so the
+   * canvas does it here: the SVG is self-contained, which is the one thing
+   * drawImage requires of it.
+   */
+  async function downloadPng() {
+    setRendering(true);
+    try {
+      const px = Number(size);
+      const image = new window.Image();
+
+      await new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error("SVG could not be decoded"));
+        image.src = svgUrl;
+      });
+
+      const canvas = document.createElement("canvas");
+      canvas.width = px;
+      // The framed artwork is taller than it is wide; keep its own ratio.
+      canvas.height = Math.round((px * image.naturalHeight) / image.naturalWidth);
+
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Canvas 2D unavailable");
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/png"),
+      );
+      if (!blob) throw new Error("Canvas produced no blob");
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${slug}-qr.png`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("PNG oluşturulamadı. SVG olarak indirmeyi deneyin.");
+    } finally {
+      setRendering(false);
+    }
+  }
 
   async function copyUrl() {
     try {
@@ -59,14 +112,13 @@ export function QrCard({
 
       <CardContent className="space-y-4">
         <div className="flex justify-center rounded-lg border bg-white p-4">
-          {/* The preview is a data: URL generated on the server, so it needs no
-              network fetch and no next/image loader. */}
-          <Image
-            src={previewDataUrl}
+          {/* Plain img: a data: URL of our own SVG, which next/image would only
+              hand back unchanged. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={svgUrl}
             alt={`${name} menüsüne yönlendiren karekod`}
-            width={200}
-            height={200}
-            unoptimized
+            className="w-full max-w-[220px]"
           />
         </div>
 
@@ -109,13 +161,16 @@ export function QrCard({
         </Button>
 
         <div className="grid grid-cols-2 gap-2">
-          {/* Plain links, not fetch+blob: the browser handles the download and
+          {/* The SVG stays a plain link: the route returns the same artwork and
               Content-Disposition names the file. */}
-          <Button
-            variant="outline"
-            render={<a href={`/api/qr/${slug}?format=png&size=${size}&download=1`} download />}
-          >
-            <Download className="size-4" aria-hidden />
+          {/* PNG is built here rather than fetched: the route cannot draw the
+              caption without a font rasterizer. */}
+          <Button variant="outline" onClick={downloadPng} disabled={rendering}>
+            {rendering ? (
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+            ) : (
+              <Download className="size-4" aria-hidden />
+            )}
             PNG
           </Button>
           <Button
