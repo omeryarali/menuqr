@@ -64,6 +64,10 @@ rather than inline sub-selects, which would nest policy evaluation and recurse.
   missing structural parent before anything else. A `Select` whose trigger shows the raw value
   (e.g. a UUID) instead of the item label needs an `items={{ value: label }}` map on `Select` —
   Base UI's `SelectValue` resolves the label from that map, Radix read it from the rendered item.
+- **Currency is a closed list in three places**: the CHECK in `0014_currency.sql`, the zod enum in
+  `lib/validators/restaurant.ts` and `CURRENCY_CODES` in `lib/currencies.ts`. Adding a fifth code
+  means touching all three; a code present in only one either fails the save or renders the Base UI
+  trigger blank.
 - **`middleware.ts` does not exist** — Next 16 renamed the convention to `proxy.ts`. Having both is
   a hard build error.
 - **`types/database.ts` is hand-maintained.** Every table needs a `Relationships` key and the schema
@@ -94,6 +98,12 @@ strings go in Turkish, inline. `<html lang="tr">`.
   only breaks in production.
 - `lib/utils/slug.ts` transliterates Turkish letters explicitly before NFD normalization — NFD alone
   drops "ğ" and mangles "ı".
+- `lib/phone.ts` is the only place that decides what a phone number is. The column holds
+  `+90XXXXXXXXXX` (migration `0015` normalized the old free text), and the form shows a fixed +90
+  while editing only the national part. Values that do not parse — a 444 service line, a foreign
+  number, a typo — are left exactly as they are rather than mangled into the pattern, which is why
+  `0015` adds no CHECK. A number carrying a country code other than +90 is never reinterpreted:
+  "+49 30 123456" is ten digits once punctuation is stripped.
 - Supabase auth emails are **not** covered by any of this; they're configured in the Supabase
   dashboard (Authentication → Email Templates) and ship in English by default.
 
@@ -194,6 +204,11 @@ degrades a malformed week to "no hours" rather than throwing on a customer's men
 - `/qr-print/[id]` and `/menu-print/[id]` live **outside** the `(dashboard)` group so the sidebar
   never reaches the paper — which makes auth their own responsibility (`requireUser` + owner-scoped
   `getRestaurant`). Both drive layout switching through `components/dashboard/print-sheet.tsx`.
+- Menu categories are native `<details>`/`<summary>`, closed by default (open when the menu has a
+  single category). No React state: it works without JavaScript and the products stay in the DOM
+  while collapsed, so crawlers and link previews still see the whole menu. The page's `@media print`
+  block forces every section open with **two** selectors — `::details-content` on current engines,
+  `display` on the non-summary children elsewhere — because browsers hide closed content differently.
 - Print layouts must not depend on Tailwind's responsive prefixes. `sm:` and friends key off the
   viewport, and if the print layout measures narrower than the breakpoint the rule silently drops —
   a two-column menu quietly prints as one. Put print rules in the page's own `@media print` block
@@ -212,10 +227,30 @@ negative the CHECK would reject, and the result never exceeds what `numeric(10,2
 `set_product_prices` (migration `0011`) takes JSONB, not parallel id/price arrays: pairing two arrays
 by index is how a menu silently gets mispriced. SECURITY INVOKER, like the reorder RPCs.
 
+## Address and geocoding
+
+`restaurants.latitude`/`longitude` (migration `0016`) are set from the Leaflet picker next to the
+address box. They are stored whole or not at all — both the CHECK and the zod refine say so, since
+half a coordinate is a point in the Gulf of Guinea. The text `address` stays the source of truth
+for what a customer reads; the map only fills it in, and a map click overwrites the text only when
+the field wrote it itself.
+
+- Leaflet is loaded through `dynamic(..., { ssr: false })` — it touches `window` at module scope.
+- **Nominatim is reached only from the server** (`lib/geocode.ts` behind `/api/geocode`). Their
+  policy caps one request per second per source and requires an identifying User-Agent, neither of
+  which a browser can honour on our behalf. The route is signed-in only: an open proxy in front of
+  a rate-limited third party is a free way to get our IP blocked.
+- Search is restricted to Turkey (`countrycodes=tr`), matching the Turkish UI and +90 phones.
+- The OSM tile attribution is a condition of use, not decoration. Don't remove it.
+
 ## Out of scope
 
 Theme builder, subscriptions, multi-user roles, per-table QR codes.
 
-QR images are derived from the restaurant slug (`/api/qr/{slug}`) — there is no row per code. A
+QR images are derived from the restaurant slug (`/api/qr/{slug}`) — there is no row per code. The
+SVG branch returns the framed artwork (`renderFramedQrSvg`, built in module units from
+`QRCode.create`); the PNG branch is the bare code, because drawing the caption server-side would
+need a font rasterizer. The dashboard builds the framed PNG in the browser by drawing that SVG to
+a canvas, which only works while the SVG stays self-contained — no external font, no CSS. A
 `qr_codes` table existed for that from `0001` until `0010` dropped it unused; if per-table codes ever
 ship, design the table then rather than reviving that one. Menu traffic lives in `menu_events`.
